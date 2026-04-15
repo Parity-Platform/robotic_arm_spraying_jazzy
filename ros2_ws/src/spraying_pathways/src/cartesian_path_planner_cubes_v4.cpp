@@ -153,7 +153,7 @@ int main(int argc, char** argv) {
   std::ofstream out(path); out << sdf_all; out.close();
 
   std::ostringstream cmd;
-  cmd << "ros2 run gazebo_ros spawn_entity.py -file " << path << " -entity all_cubes";
+  cmd << "ros2 run ros_gz_sim create -file " << path << " -name all_cubes";
   std::system(cmd.str().c_str());
 
   rclcpp::shutdown();

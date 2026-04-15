@@ -3,7 +3,7 @@
 To build the Docker image required for this project, navigate to the directory named `Dockerfile` (which contains the actual `Dockerfile`) and run the following command:
 
 ```bash
-docker image build -t my-vulcanexus:humble-desktop .
+docker image build -t my-vulcanexus:jazzy-desktop .
 ```
 
 ## Running the Docker Container
@@ -16,7 +16,7 @@ docker run -it --rm --name vulcanexus-container --user vulcanexus_user \
   --network=host --ipc=host \
   -e DISPLAY=$DISPLAY -e QT_X11_NO_MITSHM=1 \
   -v /tmp/.X11-unix:/tmp/.X11-unix:rw \
-  my-vulcanexus:humble-desktop
+  my-vulcanexus:jazzy-desktop
 ```
 
 ## First-Time Container Setup
@@ -27,9 +27,8 @@ After launching the container for the first time, you need to perform some initi
 rm -rf build/ log/ install/
 colcon build
 
-source /opt/ros/humble/setup.bash
+source /opt/ros/jazzy/setup.bash
 source install/setup.bash
-export GAZEBO_PLUGIN_PATH=/opt/ros/humble/lib
 
 rosdep update && rosdep install --ignore-src --from-paths . -y
 ```
@@ -40,9 +39,8 @@ rosdep update && rosdep install --ignore-src --from-paths . -y
 ```bash
 docker exec -it vulcanexus-container /bin/bash
 
-source /opt/ros/humble/setup.bash
+source /opt/ros/jazzy/setup.bash
 source install/setup.bash
-export GAZEBO_PLUGIN_PATH=/opt/ros/humble/lib
 ```
 
 ## Rebuilding After Changes
@@ -53,12 +51,11 @@ Every time you make changes to the workspace files inside the container — such
 rm -rf build/ log/ install/
 colcon build
 
-source /opt/ros/humble/setup.bash
+source /opt/ros/jazzy/setup.bash
 source install/setup.bash
-export GAZEBO_PLUGIN_PATH=/opt/ros/humble/lib
 ```
 
-## Visualizing the Robot in Gazebo or RViz
+## Visualizing the Robot in Gz Harmonic or RViz
 
 ```bash
 ros2 launch ur_simulation_gazebo ur_sim_control.launch.py ur_type:=ur10e

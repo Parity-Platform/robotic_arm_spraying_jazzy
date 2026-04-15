@@ -25,7 +25,7 @@ public:
 
     cloud_pub_ = this->create_publisher<sensor_msgs::msg::PointCloud2>("scan_cloud", 10);
     scan_sub_ = this->create_subscription<sensor_msgs::msg::PointCloud2>(
-      "/gazebo_ros_laser/out", 10,
+      "/lidar/scan/points", 10,
       std::bind(&LidarSurfaceScanner::cloudCallback, this, std::placeholders::_1));
 
     joint_state_sub_ = this->create_subscription<sensor_msgs::msg::JointState>(

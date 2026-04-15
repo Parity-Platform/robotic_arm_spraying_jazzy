@@ -28,8 +28,8 @@
 #include <ctime>
 
 #include <set>
-#include <moveit/trajectory_processing/iterative_time_parameterization.h>
-#include <tf2_eigen/tf2_eigen.h>
+#include <moveit/trajectory_processing/time_optimal_trajectory_generation.h>
+#include <tf2_eigen/tf2_eigen.hpp>
 #include "rclcpp/parameter_client.hpp"
 #include "ament_index_cpp/get_package_share_directory.hpp"
 #include <yaml-cpp/yaml.h>

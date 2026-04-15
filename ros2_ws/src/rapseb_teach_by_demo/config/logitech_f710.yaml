@@ -1,0 +1,51 @@
+# Logitech F710 gamepad mapping, XInput mode (MODE LED off, back switch set to 'X').
+# Verified with the standard ROS 2 'joy' driver on Linux (jstest-gtk indices).
+# Axes: float -1.0..1.0. Buttons: int 0/1.
+
+joy_teleop:
+  ros__parameters:
+    # Cartesian jog command topic
+    twist_topic: /servo_node/delta_twist_cmds
+    # Spray button broadcast
+    spray_topic: /rapseb/spray_trigger
+    # Segment marker broadcast (for splitting long demos)
+    segment_topic: /rapseb/segment_marker
+    # Base frame for twist command (usually the tool frame or base_link)
+    command_frame: tool0
+    base_frame: base_link
+
+    # Rates
+    publish_rate_hz: 100.0
+    # Deadzones
+    axis_deadzone: 0.08
+    # Scales (m/s and rad/s at full deflection)
+    linear_scale_xy: 0.08
+    linear_scale_z: 0.04
+    angular_scale: 0.4
+    # Boost multiplier when boost button held
+    boost_linear: 2.0
+    boost_angular: 1.5
+
+    # Axis indices (F710 XInput)
+    axis_left_x: 0      # linear y
+    axis_left_y: 1      # linear x
+    axis_right_x: 3     # angular yaw
+    axis_right_y: 4     # linear z (positive = up)
+    axis_triggers_lt: 2 # left trigger (resting 1.0, pressed -1.0)
+    axis_triggers_rt: 5 # right trigger
+
+    # Button indices (F710 XInput)
+    button_a: 0         # record start / next segment
+    button_b: 1         # record stop and save
+    button_x: 2         # zero twist (panic)
+    button_y: 3         # toggle freedrive (real UR only)
+    button_lb: 4        # decrement linear scale
+    button_rb: 5        # increment linear scale
+    button_back: 6      # discard current demo
+    button_start: 7     # mark segment boundary
+    button_logo: 8      # emergency cancel all goals
+
+    # Right trigger press-and-hold is the spray signal. Threshold is on the raw
+    # axis: resting value is +1.0, fully pressed is -1.0, so spray engages below
+    # this threshold.
+    spray_axis_threshold: 0.2

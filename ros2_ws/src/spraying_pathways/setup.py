@@ -9,8 +9,8 @@ setup(
     py_modules=[],
     install_requires=['setuptools'],
     zip_safe=True,
-    maintainer='Georgios Sidiropoulos',
-    maintainer_email='sidiropoulosgeorgios000@gmail.com',
+    maintainer='Parity Platform P.C.',
+    maintainer_email='info@parityplatform.com',
     description='Trajectory logger for robot',
     license='Apache-2.0',
     entry_points={

@@ -55,10 +55,8 @@
             </plane>
           </geometry>
           <material>
-            <script>
-              <uri>file://media/materials/scripts/gazebo.material</uri>
-              <name>Gazebo/Grey</name>
-            </script>
+            <ambient>0.5 0.5 0.5 1</ambient>
+            <diffuse>0.5 0.5 0.5 1</diffuse>
           </material>
         </visual>
         <self_collide>0</self_collide>
@@ -115,7 +113,7 @@
           <geometry>
             <mesh>
               <scale>1 1 1</scale>
-              <uri>file:///opt/ros/humble/share/ur_description/meshes/ur5e/collision/base.stl</uri>
+              <uri>file:///opt/ros/jazzy/share/ur_description/meshes/ur5e/collision/base.stl</uri>
             </mesh>
           </geometry>
           <max_contacts>10</max_contacts>
@@ -137,7 +135,7 @@
           <geometry>
             <mesh>
               <scale>1 1 1</scale>
-              <uri>file:///opt/ros/humble/share/ur_description/meshes/ur5e/visual/base.dae</uri>
+              <uri>file:///opt/ros/jazzy/share/ur_description/meshes/ur5e/visual/base.dae</uri>
             </mesh>
           </geometry>
         </visual>
@@ -184,7 +182,7 @@
           <geometry>
             <mesh>
               <scale>1 1 1</scale>
-              <uri>file:///opt/ros/humble/share/ur_description/meshes/ur5e/collision/shoulder.stl</uri>
+              <uri>file:///opt/ros/jazzy/share/ur_description/meshes/ur5e/collision/shoulder.stl</uri>
             </mesh>
           </geometry>
           <max_contacts>10</max_contacts>
@@ -206,7 +204,7 @@
           <geometry>
             <mesh>
               <scale>1 1 1</scale>
-              <uri>file:///opt/ros/humble/share/ur_description/meshes/ur5e/visual/shoulder.dae</uri>
+              <uri>file:///opt/ros/jazzy/share/ur_description/meshes/ur5e/visual/shoulder.dae</uri>
             </mesh>
           </geometry>
         </visual>
@@ -253,7 +251,7 @@
           <geometry>
             <mesh>
               <scale>1 1 1</scale>
-              <uri>file:///opt/ros/humble/share/ur_description/meshes/ur5e/collision/upperarm.stl</uri>
+              <uri>file:///opt/ros/jazzy/share/ur_description/meshes/ur5e/collision/upperarm.stl</uri>
             </mesh>
           </geometry>
           <max_contacts>10</max_contacts>
@@ -275,7 +273,7 @@
           <geometry>
             <mesh>
               <scale>1 1 1</scale>
-              <uri>file:///opt/ros/humble/share/ur_description/meshes/ur5e/visual/upperarm.dae</uri>
+              <uri>file:///opt/ros/jazzy/share/ur_description/meshes/ur5e/visual/upperarm.dae</uri>
             </mesh>
           </geometry>
         </visual>
@@ -322,7 +320,7 @@
           <geometry>
             <mesh>
               <scale>1 1 1</scale>
-              <uri>file:///opt/ros/humble/share/ur_description/meshes/ur5e/collision/forearm.stl</uri>
+              <uri>file:///opt/ros/jazzy/share/ur_description/meshes/ur5e/collision/forearm.stl</uri>
             </mesh>
           </geometry>
           <max_contacts>10</max_contacts>
@@ -344,7 +342,7 @@
           <geometry>
             <mesh>
               <scale>1 1 1</scale>
-              <uri>file:///opt/ros/humble/share/ur_description/meshes/ur5e/visual/forearm.dae</uri>
+              <uri>file:///opt/ros/jazzy/share/ur_description/meshes/ur5e/visual/forearm.dae</uri>
             </mesh>
           </geometry>
         </visual>
@@ -391,7 +389,7 @@
           <geometry>
             <mesh>
               <scale>1 1 1</scale>
-              <uri>file:///opt/ros/humble/share/ur_description/meshes/ur5e/collision/wrist1.stl</uri>
+              <uri>file:///opt/ros/jazzy/share/ur_description/meshes/ur5e/collision/wrist1.stl</uri>
             </mesh>
           </geometry>
           <max_contacts>10</max_contacts>
@@ -413,7 +411,7 @@
           <geometry>
             <mesh>
               <scale>1 1 1</scale>
-              <uri>file:///opt/ros/humble/share/ur_description/meshes/ur5e/visual/wrist1.dae</uri>
+              <uri>file:///opt/ros/jazzy/share/ur_description/meshes/ur5e/visual/wrist1.dae</uri>
             </mesh>
           </geometry>
         </visual>
@@ -460,7 +458,7 @@
           <geometry>
             <mesh>
               <scale>1 1 1</scale>
-              <uri>file:///opt/ros/humble/share/ur_description/meshes/ur5e/collision/wrist2.stl</uri>
+              <uri>file:///opt/ros/jazzy/share/ur_description/meshes/ur5e/collision/wrist2.stl</uri>
             </mesh>
           </geometry>
           <max_contacts>10</max_contacts>
@@ -482,7 +480,7 @@
           <geometry>
             <mesh>
               <scale>1 1 1</scale>
-              <uri>file:///opt/ros/humble/share/ur_description/meshes/ur5e/visual/wrist2.dae</uri>
+              <uri>file:///opt/ros/jazzy/share/ur_description/meshes/ur5e/visual/wrist2.dae</uri>
             </mesh>
           </geometry>
         </visual>
@@ -529,7 +527,7 @@
           <geometry>
             <mesh>
               <scale>1 1 1</scale>
-              <uri>file:///opt/ros/humble/share/ur_description/meshes/ur5e/collision/wrist3.stl</uri>
+              <uri>file:///opt/ros/jazzy/share/ur_description/meshes/ur5e/collision/wrist3.stl</uri>
             </mesh>
           </geometry>
           <max_contacts>10</max_contacts>
@@ -551,7 +549,7 @@
           <geometry>
             <mesh>
               <scale>1 1 1</scale>
-              <uri>file:///opt/ros/humble/share/ur_description/meshes/ur5e/visual/wrist3.dae</uri>
+              <uri>file:///opt/ros/jazzy/share/ur_description/meshes/ur5e/visual/wrist3.dae</uri>
             </mesh>
           </geometry>
         </visual>
@@ -560,7 +558,7 @@
         <kinematic>0</kinematic>
       </link>
       <static>0</static>
-      <plugin name='gazebo_ros2_control' filename='libgazebo_ros2_control.so'>
+      <plugin filename="gz_ros2_control-system" name="gz_ros2_control::GzSimROS2ControlPlugin">
         <parameters>/root/ros2_ws/install/ur_simulation_gazebo/share/ur_simulation_gazebo/config/ur_controllers.yaml</parameters>
       </plugin>
       <pose>0 0 0 0 -0 0</pose>
@@ -667,18 +665,9 @@
             </box>
           </geometry>
           <material>
-            <lighting>1</lighting>
-            <script>
-              <uri>file://media/materials/scripts/gazebo.material</uri>
-              <name>Gazebo/Grey</name>
-            </script>
-            <shader type='pixel'>
-              <normal_map>__default__</normal_map>
-            </shader>
             <ambient>0.3 0.3 0.3 1</ambient>
             <diffuse>0.7 0.7 0.7 1</diffuse>
             <specular>0.01 0.01 0.01 1</specular>
-            <emissive>0 0 0 1</emissive>
           </material>
           <transparency>0</transparency>
           <cast_shadows>1</cast_shadows>

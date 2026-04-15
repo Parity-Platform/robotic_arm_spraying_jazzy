@@ -4,7 +4,7 @@
 
 #include <moveit/move_group_interface/move_group_interface.h>
 #include <moveit_msgs/msg/robot_trajectory.hpp>
-#include <moveit/trajectory_processing/iterative_time_parameterization.h>
+#include <moveit/trajectory_processing/time_optimal_trajectory_generation.h>
 #include <moveit/robot_trajectory/robot_trajectory.h>
 
 #include <tf2/LinearMath/Quaternion.h>

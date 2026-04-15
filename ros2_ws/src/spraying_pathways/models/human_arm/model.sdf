@@ -52,14 +52,10 @@
       </collision>
     </link>
 
-    <!-- Planar move plugin: drive with /human_arm/cmd_vel (geometry_msgs/Twist) -->
-    <plugin name="arm_planar_move" filename="libgazebo_ros_planar_move.so">
-      <ros>
-        <namespace>human_arm</namespace>
-        <remapping>cmd_vel:=cmd_vel</remapping>
-      </ros>
-      <link_name>arm</link_name>
-      <!-- The plugin moves in X/Y; Z stays at the link's current height. -->
+    <!-- Drive with /model/human_arm/cmd_vel (bridged to ROS via gz_bridge) -->
+    <plugin filename="gz-sim-velocity-control-system"
+            name="gz::sim::systems::VelocityControl">
+      <initial_linear>0 0 0</initial_linear>
     </plugin>
 
   </model>

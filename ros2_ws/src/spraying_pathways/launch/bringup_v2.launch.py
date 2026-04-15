@@ -63,12 +63,12 @@ def launch_setup(context, *args, **kwargs):
     box_sdf_path = os.path.join(package_path, "models", "box_0_5", "model.sdf")
 
     spawn_box = Node(
-        package="gazebo_ros",
-        executable="spawn_entity.py",
+        package="ros_gz_sim",
+        executable="create",
         arguments=[
             "-file", box_sdf_path,
-            "-entity", "grasp_box",
-            "-x", "1.0", "-y", "0.2", "-z", "0.77" # "-x", "0.4", "-y", "0.25", "-z", "0.5" 
+            "-name", "grasp_box",
+            "-x", "1.0", "-y", "0.2", "-z", "0.77" # "-x", "0.4", "-y", "0.25", "-z", "0.5"
         ],
         output="screen"
     )
@@ -76,11 +76,11 @@ def launch_setup(context, *args, **kwargs):
     wood_table_sdf_path = os.path.join(package_path, "models", "wood_table", "model.sdf")
 
     spawn_wood_table = Node(
-        package="gazebo_ros",
-        executable="spawn_entity.py",
+        package="ros_gz_sim",
+        executable="create",
         arguments=[
             "-file", wood_table_sdf_path,
-            "-entity", "wood_table",
+            "-name", "wood_table",
             "-x", "0",
             "-y", "0",
             "-z", "0",
@@ -94,11 +94,11 @@ def launch_setup(context, *args, **kwargs):
     black_table_sdf_path = os.path.join(package_path, "models", "black_table", "model.sdf")
 
     spawn_black_table = Node(
-        package="gazebo_ros",
-        executable="spawn_entity.py",
+        package="ros_gz_sim",
+        executable="create",
         arguments=[
             "-file", black_table_sdf_path,
-            "-entity", "black_table",
+            "-name", "black_table",
             "-x", "1.1",
             "-y", "0",
             "-z", "0",

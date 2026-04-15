@@ -213,7 +213,7 @@ int main(int argc, char** argv) {
   std::ostringstream cmd;
   cmd << "ros2 run gazebo_ros spawn_entity.py"
       << " -file " << path
-      << " -entity all_cubes";
+      << " -name all_cubes";
   std::system(cmd.str().c_str());
 
   rclcpp::shutdown();

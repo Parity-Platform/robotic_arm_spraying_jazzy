@@ -110,7 +110,7 @@ int main(int argc, char** argv) {
       /*mat=*/"My/Seaweed", /*static=*/true);
 
   std::ofstream out("/tmp/multi_cubes.sdf"); out << sdf_content; out.close();
-  std::system("ros2 run gazebo_ros spawn_entity.py -file /tmp/multi_cubes.sdf -entity all_cubes");
+  std::system("ros2 run ros_gz_sim create -file /tmp/multi_cubes.sdf -name all_cubes");
 
   // Convert cubes to ROBOT BASE for matching with incoming points (which are in base_link)
   for (auto& c : cubes) {

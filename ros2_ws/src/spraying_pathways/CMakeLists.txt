@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.8)
+cmake_minimum_required(VERSION 3.16)
 project(spraying_pathways)
 
 if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
@@ -15,7 +15,7 @@ find_package(geometry_msgs REQUIRED)
 find_package(std_msgs REQUIRED)
 find_package(sensor_msgs REQUIRED)
 find_package(urdf REQUIRED)
-find_package(gazebo_ros REQUIRED)
+find_package(ros_gz_sim REQUIRED)
 find_package(tf2_ros REQUIRED)
 find_package(laser_geometry REQUIRED)
 find_package(pcl_ros REQUIRED)
@@ -25,7 +25,7 @@ find_package(tf2_sensor_msgs REQUIRED)
 find_package(tf2_py REQUIRED)
 find_package(moveit_core REQUIRED)
 find_package(yaml-cpp REQUIRED)
-find_package(gazebo_msgs REQUIRED)
+find_package(ros_gz_interfaces REQUIRED)
 find_package(ament_index_cpp REQUIRED)
 find_package(rclcpp_action REQUIRED)    ###########
 find_package(control_msgs REQUIRED)
@@ -209,7 +209,7 @@ add_executable(moving_obstacle src/moving_obstacle.cpp)
 ament_target_dependencies(moving_obstacle
   rclcpp
   geometry_msgs
-  gazebo_msgs
+  ros_gz_interfaces
   ament_index_cpp
 )
 

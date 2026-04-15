@@ -1,4 +1,4 @@
-FROM ubuntu-vulcanexus:humble-desktop
+FROM ubuntu-vulcanexus:jazzy-desktop
 
 # Define arguments for the new user creation
 ARG USERNAME=vulcanexus_user
@@ -8,7 +8,7 @@ ARG USER_GID=$USER_UID
 # Refresh ROS 2 key and repo
 RUN rm -f /etc/apt/sources.list.d/ros2*.list && \
     curl -sSL https://raw.githubusercontent.com/ros/rosdistro/master/ros.key | gpg --dearmor -o /usr/share/keyrings/ros-archive-keyring.gpg && \
-    echo "deb [signed-by=/usr/share/keyrings/ros-archive-keyring.gpg] http://packages.ros.org/ros2/ubuntu jammy main" > /etc/apt/sources.list.d/ros2.list
+    echo "deb [signed-by=/usr/share/keyrings/ros-archive-keyring.gpg] http://packages.ros.org/ros2/ubuntu noble main" > /etc/apt/sources.list.d/ros2.list
 
 # Install basic CLI tools and dependencies
 RUN apt-get update && apt-get install -y \
@@ -21,31 +21,28 @@ RUN apt-get update && apt-get install -y \
 
 # Install ROS 2 and simulation-related packages
 RUN apt-get update && apt install -y \
-    ros-humble-pcl-conversions ros-humble-pcl-ros \
-    ros-humble-ur-description \
-    ros-humble-tf-transformations \
-    ros-humble-desktop \
-    gazebo \
-    ros-humble-gazebo-ros \
-    ros-humble-gazebo-ros-pkgs \
-    ros-humble-ros2-control \
-    ros-humble-ros2-controllers \
-    ros-humble-gazebo-ros2-control \
-    ros-humble-joint-state-publisher-gui \
-    ros-humble-xacro \
+    ros-jazzy-pcl-conversions ros-jazzy-pcl-ros \
+    ros-jazzy-ur-description \
+    ros-jazzy-tf-transformations \
+    ros-jazzy-desktop \
+    ros-jazzy-ros-gz \
+    ros-jazzy-gz-ros2-control \
+    ros-jazzy-ros2-control \
+    ros-jazzy-ros2-controllers \
+    ros-jazzy-joint-state-publisher-gui \
+    ros-jazzy-xacro \
     python3-colcon-common-extensions \
     python3-rosdep \
     python3-vcstool \
     build-essential \
-    ros-humble-moveit \
-    ros-humble-moveit-ros-planning \
-    ros-humble-moveit-ros-planning-interface
+    ros-jazzy-moveit \
+    ros-jazzy-moveit-ros-planning \
+    ros-jazzy-moveit-ros-planning-interface
 
 # Python tooling + deps for numpy-stl
 RUN apt-get update && apt-get install -y \
     python3-pip \
     python3-numpy \
-    python3-sklearn \
  && pip3 install --no-cache-dir numpy-stl \
  && rm -rf /var/lib/apt/lists/*
 

@@ -26,7 +26,7 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 #
-# Author: Denis Stogl
+# Author: Parity Platform P.C.
 
 from launch import LaunchDescription
 from launch.actions import (
@@ -160,7 +160,7 @@ def launch_setup(context, *args, **kwargs):
     # Gazebo nodes
     gazebo = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
-            [FindPackageShare("gazebo_ros"), "/launch", "/gazebo.launch.py"]
+            [FindPackageShare("ros_gz_sim"), "/launch", "/gz_sim.launch.py"]
         ),
         launch_arguments={
             "gui": gazebo_gui,
@@ -169,10 +169,10 @@ def launch_setup(context, *args, **kwargs):
 
     # Spawn robot
     gazebo_spawn_robot = Node(
-        package="gazebo_ros",
-        executable="spawn_entity.py",
+        package="ros_gz_sim",
+        executable="create",
         name="spawn_ur",
-        arguments=["-entity", "ur", "-topic", "robot_description"],
+        arguments=["-name", "ur", "-topic", "robot_description"],
         output="screen",
     )
 

@@ -60,12 +60,12 @@ def launch_setup(context, *args, **kwargs):
     box_sdf_path = os.path.join(package_path, "models", "box_0_5", "model.sdf")
 
     spawn_box = Node(
-        package="gazebo_ros",
-        executable="spawn_entity.py",
+        package="ros_gz_sim",
+        executable="create",
         arguments=[
             "-file", box_sdf_path,
-            "-entity", "grasp_box",
-            "-x", "0.5", "-y", "0.25", "-z", "0.1" # "-x", "0.4", "-y", "0.25", "-z", "0.5" 
+            "-name", "grasp_box",
+            "-x", "0.5", "-y", "0.25", "-z", "0.1" # "-x", "0.4", "-y", "0.25", "-z", "0.5"
         ],
         output="screen"
     )

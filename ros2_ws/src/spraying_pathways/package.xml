@@ -5,7 +5,7 @@
   <version>0.0.0</version>
   <description>Package for robot spraying and trajectory logging</description>
 
-  <maintainer email="sidiropoulosgeorgios000@gmail.com">Georgios Sidiropoulos</maintainer>
+  <maintainer email="info@parityplatform.com">Parity Platform P.C.</maintainer>
   <license>Apache-2.0</license>
 
   <!-- Build tools -->
@@ -19,7 +19,8 @@
   <depend>std_msgs</depend>
   <depend>sensor_msgs</depend>
   <depend>urdf</depend>
-  <depend>gazebo_ros</depend>
+  <depend>ros_gz_sim</depend>
+  <depend>ros_gz_bridge</depend>
   <depend>tf2_ros</depend>
   <depend>control_msgs</depend>
   <depend>tf_transformations</depend>

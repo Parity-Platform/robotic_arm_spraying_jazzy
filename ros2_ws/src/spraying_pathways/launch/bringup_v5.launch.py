@@ -125,13 +125,7 @@ def launch_setup(context, *args, **kwargs):
     ompl_config = {
         "move_group": {
             "planning_plugin": "ompl_interface/OMPLPlanner",
-            "request_adapters": (
-                "default_planner_request_adapters/AddTimeOptimalParameterization "
-                "default_planner_request_adapters/FixWorkspaceBounds "
-                "default_planner_request_adapters/FixStartStateBounds "
-                "default_planner_request_adapters/FixStartStateCollision "
-                "default_planner_request_adapters/FixStartStatePathConstraints"
-            ),
+            "request_adapters": "",
             "start_state_max_bounds_error": 0.1,
             **ompl,
         }
@@ -183,9 +177,9 @@ def launch_setup(context, *args, **kwargs):
     )
 
     spawn_ur = Node(
-        package="gazebo_ros",
-        executable="spawn_entity.py",
-        arguments=["-entity", "ur", "-topic", "robot_description", "-x", "0.25", "-y", "0", "-z", "0.715"],
+        package="ros_gz_sim",
+        executable="create",
+        arguments=["-name", "ur", "-topic", "robot_description", "-x", "0.25", "-y", "0", "-z", "0.715"],
         output="screen",
     )
 
@@ -226,17 +220,19 @@ def launch_setup(context, *args, **kwargs):
 
     gzserver = IncludeLaunchDescription(
         PythonLaunchDescriptionSource([
-            PathJoinSubstitution([FindPackageShare("gazebo_ros"), "launch", "gzserver.launch.py"])
+            PathJoinSubstitution([FindPackageShare("ros_gz_sim"), "launch", "gz_sim.launch.py"])
         ]),
-        launch_arguments={"world": world_file,
+        launch_arguments={"world_sdf_file": world_file,
         }.items()
     )
 
-    gzclient = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource([
-            PathJoinSubstitution([FindPackageShare("gazebo_ros"), "launch", "gzclient.launch.py"])
-        ]),
-        condition=IfCondition(gazebo_gui),
+    # Sensor topic bridge (Gz <-> ROS 2)
+    gz_bridge_config = os.path.join(src_spraying_pathways_pkg, 'config', 'gz_bridge.yaml')
+    gz_bridge_node = Node(
+        package="ros_gz_bridge",
+        executable="parameter_bridge",
+        arguments=["--ros-args", "-p", f"config_file:={gz_bridge_config}"],
+        output="screen",
     )
 
     pointcloud_transform_and_unknown_filter_script = TimerAction(
@@ -253,7 +249,7 @@ def launch_setup(context, *args, **kwargs):
 
     return [
         gzserver,
-        gzclient,
+        gz_bridge_node,
         robot_state_publisher_node,
         joint_state_broadcaster,
         initial_joint_controller_start,

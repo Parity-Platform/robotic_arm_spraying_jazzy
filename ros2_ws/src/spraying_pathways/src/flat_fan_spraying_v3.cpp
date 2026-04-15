@@ -6,7 +6,7 @@
 #include <moveit_msgs/msg/robot_trajectory.hpp>
 
 #include <tf2_geometry_msgs/tf2_geometry_msgs.hpp>
-#include <tf2_eigen/tf2_eigen.h>
+#include <tf2_eigen/tf2_eigen.hpp>
 
 #include <ament_index_cpp/get_package_share_directory.hpp>
 #include <yaml-cpp/yaml.h>
@@ -222,7 +222,7 @@ int main(int argc, char** argv) {
   // Gazebo SDF spawn
   std::string sdf_content = sp::generate_multi_box_sdf(cubes, std::abs(cube_size_x), std::abs(cube_size_y));
   std::ofstream out("/tmp/multi_cubes.sdf"); out << sdf_content; out.close();
-  std::system("ros2 run gazebo_ros spawn_entity.py -file /tmp/multi_cubes.sdf -entity all_cubes");
+  std::system("ros2 run ros_gz_sim create -file /tmp/multi_cubes.sdf -name all_cubes");
 
   executor->cancel();
   executor_thread.join();

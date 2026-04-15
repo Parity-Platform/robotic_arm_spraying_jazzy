@@ -1,0 +1,80 @@
+# Gz <-> ROS 2 topic bridge configuration
+# Run `gz topic -l` in the container to verify actual Gz topic names.
+
+# Depth camera (fixed mount)
+- ros_topic_name: "depth_camera/image_raw"
+  gz_topic_name: "depth_camera/image"
+  ros_type_name: "sensor_msgs/msg/Image"
+  gz_type_name: "gz.msgs.Image"
+  direction: GZ_TO_ROS
+
+- ros_topic_name: "depth_camera/depth/image_raw"
+  gz_topic_name: "depth_camera/depth_image"
+  ros_type_name: "sensor_msgs/msg/Image"
+  gz_type_name: "gz.msgs.Image"
+  direction: GZ_TO_ROS
+
+- ros_topic_name: "depth_camera/points"
+  gz_topic_name: "depth_camera/points"
+  ros_type_name: "sensor_msgs/msg/PointCloud2"
+  gz_type_name: "gz.msgs.PointCloudPacked"
+  direction: GZ_TO_ROS
+
+- ros_topic_name: "depth_camera/camera_info"
+  gz_topic_name: "depth_camera/camera_info"
+  ros_type_name: "sensor_msgs/msg/CameraInfo"
+  gz_type_name: "gz.msgs.CameraInfo"
+  direction: GZ_TO_ROS
+
+# Wrist-mounted depth camera (end-effector)
+- ros_topic_name: "wrist3_cam/image_raw"
+  gz_topic_name: "wrist3_cam/image"
+  ros_type_name: "sensor_msgs/msg/Image"
+  gz_type_name: "gz.msgs.Image"
+  direction: GZ_TO_ROS
+
+- ros_topic_name: "wrist3_cam/depth/image_raw"
+  gz_topic_name: "wrist3_cam/depth_image"
+  ros_type_name: "sensor_msgs/msg/Image"
+  gz_type_name: "gz.msgs.Image"
+  direction: GZ_TO_ROS
+
+- ros_topic_name: "wrist3_cam/points"
+  gz_topic_name: "wrist3_cam/points"
+  ros_type_name: "sensor_msgs/msg/PointCloud2"
+  gz_type_name: "gz.msgs.PointCloudPacked"
+  direction: GZ_TO_ROS
+
+- ros_topic_name: "wrist3_cam/camera_info"
+  gz_topic_name: "wrist3_cam/camera_info"
+  ros_type_name: "sensor_msgs/msg/CameraInfo"
+  gz_type_name: "gz.msgs.CameraInfo"
+  direction: GZ_TO_ROS
+
+# Lidar (PointCloud2)
+- ros_topic_name: "lidar/scan/points"
+  gz_topic_name: "lidar/scan/points"
+  ros_type_name: "sensor_msgs/msg/PointCloud2"
+  gz_type_name: "gz.msgs.PointCloudPacked"
+  direction: GZ_TO_ROS
+
+# Lidar (LaserScan)
+- ros_topic_name: "lidar/scan"
+  gz_topic_name: "lidar/scan"
+  ros_type_name: "sensor_msgs/msg/LaserScan"
+  gz_type_name: "gz.msgs.LaserScan"
+  direction: GZ_TO_ROS
+
+# Clock
+- ros_topic_name: "/clock"
+  gz_topic_name: "/clock"
+  ros_type_name: "rosgraph_msgs/msg/Clock"
+  gz_type_name: "gz.msgs.Clock"
+  direction: GZ_TO_ROS
+
+# Human arm velocity control
+- ros_topic_name: "human_arm/cmd_vel"
+  gz_topic_name: "/model/human_arm/cmd_vel"
+  ros_type_name: "geometry_msgs/msg/Twist"
+  gz_type_name: "gz.msgs.Twist"
+  direction: ROS_TO_GZ

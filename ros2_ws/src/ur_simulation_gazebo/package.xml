@@ -3,13 +3,13 @@
 <package format="3">
   <name>ur_simulation_gazebo</name>
   <version>0.0.0</version>
-  <description>Example and configuration files for Gazebo Classic simulation of UR manipulators.</description>
+  <description>Configuration and launch files for Gz Harmonic simulation of UR manipulators.</description>
 
-  <author>Lovro Ivanov</author>
+  <author>Parity Platform P.C.</author>
 
-  <maintainer email="denis@stoglrobotics.de">Denis Stogl</maintainer>
+  <maintainer email="info@parityplatform.com">Parity Platform P.C.</maintainer>
 
-  <license>BSD-3-Clause</license>
+  <license>Apache-2.0</license>
 
   <url type="bugtracker">https://github.com/UniversalRobots/Universal_Robots_ROS2_Gazebo_Simulation/issues</url>
   <url type="repository">https://github.com/UniversalRobots/Universal_Robots_ROS2_Gazebo_Simulation</url>
@@ -17,8 +17,8 @@
   <buildtool_depend>ament_cmake</buildtool_depend>
 
   <exec_depend>controller_manager</exec_depend>
-  <exec_depend>gazebo_ros2_control</exec_depend>
-  <exec_depend>gazebo_ros</exec_depend>
+  <exec_depend>gz_ros2_control</exec_depend>
+  <exec_depend>ros_gz_sim</exec_depend>
   <exec_depend>joint_state_broadcaster</exec_depend>
   <exec_depend>launch</exec_depend>
   <exec_depend>launch_ros</exec_depend>
