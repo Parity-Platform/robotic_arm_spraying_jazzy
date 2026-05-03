@@ -1,16 +1,8 @@
-FROM ubuntu-vulcanexus:jazzy-desktop
+FROM eprosima/vulcanexus:jazzy-desktop
 
-# Define arguments for the new user creation
 ARG USERNAME=vulcanexus_user
-ARG USER_UID=1000
-ARG USER_GID=$USER_UID
 
-# Refresh ROS 2 key and repo
-RUN rm -f /etc/apt/sources.list.d/ros2*.list && \
-    curl -sSL https://raw.githubusercontent.com/ros/rosdistro/master/ros.key | gpg --dearmor -o /usr/share/keyrings/ros-archive-keyring.gpg && \
-    echo "deb [signed-by=/usr/share/keyrings/ros-archive-keyring.gpg] http://packages.ros.org/ros2/ubuntu noble main" > /etc/apt/sources.list.d/ros2.list
-
-# Install basic CLI tools and dependencies
+# Install basic CLI tools
 RUN apt-get update && apt-get install -y \
     nano \
     sudo \
@@ -20,38 +12,48 @@ RUN apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/*
 
 # Install ROS 2 and simulation-related packages
-RUN apt-get update && apt install -y \
-    ros-jazzy-pcl-conversions ros-jazzy-pcl-ros \
-    ros-jazzy-ur-description \
+RUN apt-get update && apt-get install -y \
+    ros-jazzy-pcl-conversions \
+    ros-jazzy-pcl-ros \
+    ros-jazzy-laser-geometry \
+    ros-jazzy-sensor-msgs-py \
     ros-jazzy-tf-transformations \
-    ros-jazzy-desktop \
+    ros-jazzy-tf2-sensor-msgs \
+    ros-jazzy-tf2-geometry-msgs \
+    ros-jazzy-ur-description \
+    ros-jazzy-ur-moveit-config \
+    ros-jazzy-ur-robot-driver \
     ros-jazzy-ros-gz \
     ros-jazzy-gz-ros2-control \
     ros-jazzy-ros2-control \
     ros-jazzy-ros2-controllers \
     ros-jazzy-joint-state-publisher-gui \
     ros-jazzy-xacro \
+    ros-jazzy-joy \
+    ros-jazzy-hri-msgs \
+    ros-jazzy-rosbag2-cpp \
+    ros-jazzy-moveit \
+    ros-jazzy-moveit-ros-planning \
+    ros-jazzy-moveit-ros-planning-interface \
     python3-colcon-common-extensions \
     python3-rosdep \
     python3-vcstool \
     build-essential \
-    ros-jazzy-moveit \
-    ros-jazzy-moveit-ros-planning \
-    ros-jazzy-moveit-ros-planning-interface
+    && rm -rf /var/lib/apt/lists/*
 
 # Python tooling + deps for numpy-stl
 RUN apt-get update && apt-get install -y \
     python3-pip \
     python3-numpy \
- && pip3 install --no-cache-dir numpy-stl \
- && rm -rf /var/lib/apt/lists/*
+    python3-scipy \
+    && pip3 install --no-cache-dir --break-system-packages numpy-stl \
+    && rm -rf /var/lib/apt/lists/*
 
-    
-# Create a non-root user with passwordless sudo privileges
-RUN groupadd --gid $USER_GID $USERNAME && \
-    useradd -s /bin/bash --uid $USER_UID --gid $USER_GID -m $USERNAME && \
+# Create a non-root user with passwordless sudo privileges and rename the existing ubuntu user (UID 1000) to match the desired username
+RUN usermod -l $USERNAME ubuntu && \
+    usermod -d /home/$USERNAME -m $USERNAME && \
+    groupmod -n $USERNAME ubuntu && \
     echo "$USERNAME ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/$USERNAME && \
     chmod 0440 /etc/sudoers.d/$USERNAME
 
-# Switch to the non-root user
 USER ${USERNAME}
