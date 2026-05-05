@@ -1,8 +1,8 @@
-#include <moveit/move_group_interface/move_group_interface.h>
-#include <moveit/planning_scene_interface/planning_scene_interface.h>
-#include <moveit/robot_model_loader/robot_model_loader.h>
-#include <moveit/robot_state/robot_state.h>
-#include <moveit/robot_trajectory/robot_trajectory.h>
+#include <moveit/move_group_interface/move_group_interface.hpp>
+#include <moveit/planning_scene_interface/planning_scene_interface.hpp>
+#include <moveit/robot_model_loader/robot_model_loader.hpp>
+#include <moveit/robot_state/robot_state.hpp>
+#include <moveit/robot_trajectory/robot_trajectory.hpp>
 #include <moveit_msgs/msg/robot_trajectory.hpp>
 #include <tf2_geometry_msgs/tf2_geometry_msgs.hpp>
 
@@ -28,7 +28,7 @@
 #include <ctime>
 
 #include <set>
-#include <moveit/trajectory_processing/time_optimal_trajectory_generation.h>
+#include <moveit/trajectory_processing/time_optimal_trajectory_generation.hpp>
 #include <tf2_eigen/tf2_eigen.hpp>
 #include "rclcpp/parameter_client.hpp"
 #include "ament_index_cpp/get_package_share_directory.hpp"
@@ -42,7 +42,7 @@
 #include <atomic>
 #include <chrono>
 #include <thread>
-#include <moveit/robot_state/conversions.h>
+#include <moveit/robot_state/conversions.hpp>
 
 using moveit::core::RobotState;
 
@@ -607,12 +607,12 @@ static void execute_with_pause_resume(
     msg2.joint_trajectory = remainder;
 
     moveit::planning_interface::MoveGroupInterface::Plan plan2;
-    plan2.trajectory_ = msg2;
+    plan2.trajectory = msg2;
 
     // start_state = τρέχουσα στάση (βοηθά στα tolerances)
     {
       moveit::core::RobotStatePtr st = mgi.getCurrentState(0.2);
-      moveit::core::robotStateToRobotStateMsg(*st, plan2.start_state_);
+      moveit::core::robotStateToRobotStateMsg(*st, plan2.start_state);
     }
 
     gate.clearCancelFlag();
@@ -779,15 +779,14 @@ int main(int argc, char** argv) {
     single_waypoint.push_back(target_pose);
 
     moveit_msgs::msg::RobotTrajectory trajectory;
-    const double jump_threshold = 0.0;
     const double eef_step = 0.01;
 
-    double fraction = move_group.computeCartesianPath(single_waypoint, eef_step, jump_threshold, trajectory);
+    double fraction = move_group.computeCartesianPath(single_waypoint, eef_step,trajectory);
 
     if (fraction > 0.95) {
         RCLCPP_INFO(node->get_logger(), "Cartesian path planned successfully (%.1f%% achieved)", fraction * 100.0);
         moveit::planning_interface::MoveGroupInterface::Plan plan;
-        plan.trajectory_ = trajectory;
+        plan.trajectory = trajectory;
         move_group.execute(plan);
     } else {
         RCLCPP_WARN(node->get_logger(), "Only %.1f%% of Cartesian path was planned", fraction * 100.0);
@@ -808,7 +807,7 @@ int main(int argc, char** argv) {
 
     moveit_msgs::msg::RobotTrajectory trajectory_2;
 
-    double fraction_2 = move_group.computeCartesianPath(trajectory_waypoints, eef_step, jump_threshold, trajectory_2);
+    double fraction_2 = move_group.computeCartesianPath(trajectory_waypoints, eef_step,trajectory_2);
     RCLCPP_INFO(node->get_logger(), "Cartesian path planning completed %.2f%% of the path", fraction_2 * 100.0);
 
     const auto& joint_names = trajectory_2.joint_trajectory.joint_names;

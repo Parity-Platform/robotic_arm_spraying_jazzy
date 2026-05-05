@@ -1,5 +1,5 @@
 #include <rclcpp/rclcpp.hpp>
-#include <moveit/move_group_interface/move_group_interface.h>
+#include <moveit/move_group_interface/move_group_interface.hpp>
 #include <geometry_msgs/msg/pose.hpp>
 #include <moveit_msgs/msg/robot_trajectory.hpp>
 
@@ -93,8 +93,7 @@ int main(int argc, char** argv) {
 
   moveit_msgs::msg::RobotTrajectory trajectory;
   const double eef_step = 0.01;
-  const double jump_thresh = 0.0;
-  double fraction = move_group.computeCartesianPath(waypoints, eef_step, jump_thresh, trajectory);
+  double fraction = move_group.computeCartesianPath(waypoints, eef_step,trajectory);
 
   if (fraction > 0.90) {
     RCLCPP_INFO(node->get_logger(), "Planned %.1f%% of path. Executing...", fraction * 100.0);

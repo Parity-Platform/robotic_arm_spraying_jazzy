@@ -1,6 +1,6 @@
 #include <rclcpp/rclcpp.hpp>
 #include <geometry_msgs/msg/pose.hpp>
-#include <moveit/move_group_interface/move_group_interface.h>
+#include <moveit/move_group_interface/move_group_interface.hpp>
 #include <tf2/LinearMath/Quaternion.h>
 #include <fstream>
 #include <sstream>
@@ -176,8 +176,7 @@ int main(int argc, char** argv) {
   // First trajectory
   moveit_msgs::msg::RobotTrajectory trajectory;
   const double eef_step = 0.01;
-  const double jump_threshold = 0.0;
-  double fraction = move_group.computeCartesianPath(waypoints, eef_step, jump_threshold, trajectory);
+  double fraction = move_group.computeCartesianPath(waypoints, eef_step,trajectory);
   if (fraction > 0.9) {
     RCLCPP_INFO(node->get_logger(), "Path %.2f%% planned successfully. Executing...", fraction * 100.0);
     move_group.execute(trajectory);
@@ -239,7 +238,7 @@ int main(int argc, char** argv) {
     });
 
     moveit_msgs::msg::RobotTrajectory traj2;
-    double frac2 = move_group.computeCartesianPath(selected_waypoints, eef_step, jump_threshold, traj2);
+    double frac2 = move_group.computeCartesianPath(selected_waypoints, eef_step,traj2);
     if (frac2 > 0.9) {
       RCLCPP_INFO(node->get_logger(), "Final path %.2f%% planned successfully.", frac2 * 100.0);
       move_group.execute(traj2);

@@ -56,4 +56,8 @@ RUN usermod -l $USERNAME ubuntu && \
     echo "$USERNAME ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/$USERNAME && \
     chmod 0440 /etc/sudoers.d/$USERNAME
 
+# Auto-source Vulcanexus environment for every new terminal
+RUN echo "source /opt/vulcanexus/jazzy/setup.bash" >> /home/${USERNAME}/.bashrc
+
+# Switch to the non-root user
 USER ${USERNAME}
