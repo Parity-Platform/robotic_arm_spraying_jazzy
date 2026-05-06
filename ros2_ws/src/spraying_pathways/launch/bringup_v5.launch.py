@@ -222,8 +222,7 @@ def launch_setup(context, *args, **kwargs):
         PythonLaunchDescriptionSource([
             PathJoinSubstitution([FindPackageShare("ros_gz_sim"), "launch", "gz_sim.launch.py"])
         ]),
-        launch_arguments={"world_sdf_file": world_file,
-        }.items()
+        launch_arguments={"gz_args": ["-r ", world_file]}.items()
     )
 
     # Sensor topic bridge (Gz <-> ROS 2)
