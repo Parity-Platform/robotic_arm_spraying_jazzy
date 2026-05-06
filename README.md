@@ -169,7 +169,6 @@ docker run -it --rm --name vulcanexus-container --user vulcanexus_user \
 cd /ros2_ws
 rm -rf build/ log/ install/
 colcon build
-source /opt/ros/jazzy/setup.bash
 source install/setup.bash
 rosdep update && rosdep install --ignore-src --from-paths . -y
 ```

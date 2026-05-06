@@ -2,11 +2,11 @@
 #include <sensor_msgs/msg/point_cloud2.hpp>
 #include <sensor_msgs/msg/joint_state.hpp>
 #include <geometry_msgs/msg/pose.hpp>
-#include <moveit/move_group_interface/move_group_interface.h>
+#include <moveit/move_group_interface/move_group_interface.hpp>
 #include <moveit_msgs/msg/robot_trajectory.hpp>
 #include <tf2_ros/transform_listener.h>
 #include <tf2_ros/buffer.h>
-#include <tf2_sensor_msgs/tf2_sensor_msgs.h>
+#include <tf2_sensor_msgs/tf2_sensor_msgs.hpp>
 #include <thread>
 #include <atomic>
 #include <tf2/LinearMath/Quaternion.h>
@@ -186,9 +186,8 @@ int main(int argc, char** argv) {
 
   moveit_msgs::msg::RobotTrajectory trajectory;
   const double eef_step = 0.01;
-  const double jump_threshold = 0.0;
 
-  double fraction = move_group.computeCartesianPath(waypoints, eef_step, jump_threshold, trajectory);
+  double fraction = move_group.computeCartesianPath(waypoints, eef_step,trajectory);
 
   if (fraction > 0.9) {
     RCLCPP_INFO(node->get_logger(), "Path %.2f%% planned successfully. Executing...", fraction * 100.0);

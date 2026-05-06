@@ -94,6 +94,7 @@ ament_target_dependencies(cartesian_path_planner_cubes_v3_node
   std_msgs
   sensor_msgs
   tf2_ros
+  tf2_sensor_msgs
 )
 
 add_executable(cartesian_path_planner_cubes_test_v1_node src/cartesian_path_planner_cubes_test_v1.cpp)
@@ -154,6 +155,7 @@ ament_target_dependencies(lidar_surface_scanner_node
   std_msgs
   sensor_msgs
   tf2_ros
+  tf2_sensor_msgs
   pcl_conversions
 )
 
@@ -209,8 +211,6 @@ add_executable(moving_obstacle src/moving_obstacle.cpp)
 ament_target_dependencies(moving_obstacle
   rclcpp
   geometry_msgs
-  ros_gz_interfaces
-  ament_index_cpp
 )
 
 add_executable(flat_fan_spraying_v3_node src/flat_fan_spraying_v3.cpp)
@@ -311,9 +311,6 @@ install(DIRECTORY launch
   DESTINATION share/${PROJECT_NAME}
 )
 
-install(DIRECTORY rviz
-  DESTINATION share/${PROJECT_NAME}
-)
 
 install(DIRECTORY config
   DESTINATION share/${PROJECT_NAME}

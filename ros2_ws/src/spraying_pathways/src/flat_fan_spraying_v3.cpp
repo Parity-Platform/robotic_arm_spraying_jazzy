@@ -1,8 +1,8 @@
 #include <rclcpp/rclcpp.hpp>
 #include <geometry_msgs/msg/pose.hpp>
 
-#include <moveit/move_group_interface/move_group_interface.h>
-#include <moveit/robot_trajectory/robot_trajectory.h>
+#include <moveit/move_group_interface/move_group_interface.hpp>
+#include <moveit/robot_trajectory/robot_trajectory.hpp>
 #include <moveit_msgs/msg/robot_trajectory.hpp>
 
 #include <tf2_geometry_msgs/tf2_geometry_msgs.hpp>
@@ -142,7 +142,6 @@ int main(int argc, char** argv) {
   move_group.setMaxAccelerationScalingFactor(0.1);
 
   moveit_msgs::msg::RobotTrajectory trajectory;
-  const double jump_threshold = 0.0;
   const double eef_step = 0.01;
 
   geometry_msgs::msg::Pose target_pose;
@@ -151,11 +150,11 @@ int main(int argc, char** argv) {
   target_pose.position.z = 0.2;
   target_pose.orientation = orientation;
 
-  double fraction = move_group.computeCartesianPath({target_pose}, eef_step, jump_threshold, trajectory);
+  double fraction = move_group.computeCartesianPath({target_pose}, eef_step,trajectory);
   if (fraction > 0.95) {
     RCLCPP_INFO(node->get_logger(), "Cartesian path planned successfully (%.1f%% achieved)", fraction * 100.0);
     moveit::planning_interface::MoveGroupInterface::Plan plan;
-    plan.trajectory_ = trajectory;
+    plan.trajectory = trajectory;
     move_group.execute(plan);
   } else {
     RCLCPP_WARN(node->get_logger(), "Only %.1f%% of Cartesian path was planned", fraction * 100.0);
@@ -173,7 +172,7 @@ int main(int argc, char** argv) {
   }
 
   moveit_msgs::msg::RobotTrajectory trajectory_2;
-  double fraction_2 = move_group.computeCartesianPath(trajectory_waypoints, eef_step, jump_threshold, trajectory_2);
+  double fraction_2 = move_group.computeCartesianPath(trajectory_waypoints, eef_step,trajectory_2);
   RCLCPP_INFO(node->get_logger(), "Cartesian path planning completed %.2f%% of the path", fraction_2 * 100.0);
 
   const auto& joint_names  = trajectory_2.joint_trajectory.joint_names;
@@ -214,7 +213,7 @@ int main(int argc, char** argv) {
   robot_traj.getRobotTrajectoryMsg(msg);
   {
     moveit::planning_interface::MoveGroupInterface::Plan plan;
-    plan.trajectory_ = msg;
+    plan.trajectory = msg;
     RCLCPP_INFO(node->get_logger(), "Executing FK-time-mapped trajectory...");
     move_group.execute(plan);
   }

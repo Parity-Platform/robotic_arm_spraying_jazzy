@@ -6,7 +6,7 @@
 #include <tf2_ros/transform_listener.h>
 #include <tf2_eigen/tf2_eigen.hpp>
 
-#include <moveit/robot_model_loader/robot_model_loader.h>
+#include <moveit/robot_model_loader/robot_model_loader.hpp>
 #include <moveit/point_containment_filter/shape_mask.h>  // note: .h
 #include <moveit/robot_model/robot_model.h>
 #include <moveit/robot_model/link_model.h>

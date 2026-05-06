@@ -2,10 +2,10 @@
 #include <sensor_msgs/msg/point_cloud2.hpp>
 #include <sensor_msgs/point_cloud2_iterator.hpp>
 
-#include <moveit/move_group_interface/move_group_interface.h>
+#include <moveit/move_group_interface/move_group_interface.hpp>
 #include <moveit_msgs/msg/robot_trajectory.hpp>
-#include <moveit/trajectory_processing/time_optimal_trajectory_generation.h>
-#include <moveit/robot_trajectory/robot_trajectory.h>
+#include <moveit/trajectory_processing/time_optimal_trajectory_generation.hpp>
+#include <moveit/robot_trajectory/robot_trajectory.hpp>
 
 #include <tf2/LinearMath/Quaternion.h>
 #include <tf2_geometry_msgs/tf2_geometry_msgs.hpp>
@@ -178,11 +178,10 @@ private:
 
     moveit_msgs::msg::RobotTrajectory traj_msg;
     const double eef_step = 0.01;       // meters resolution
-    const double jump_threshold = 0.0;  // disable jump threshold
     const bool avoid_collisions = true;
 
     double fraction = move_group_->computeCartesianPath(
-      waypoints, eef_step, jump_threshold, traj_msg, avoid_collisions);
+      waypoints, eef_step,traj_msg, avoid_collisions);
 
     RCLCPP_INFO(this->get_logger(), "computeCartesianPath: fraction=%.3f, points=%zu",
                 fraction, traj_msg.joint_trajectory.points.size());
@@ -207,8 +206,8 @@ private:
       robot_trajectory::RobotTrajectory rt(robot_model, move_group_->getName());
       rt.setRobotTrajectoryMsg(*current_state, traj_msg);
 
-      trajectory_processing::IterativeParabolicTimeParameterization iptp;
-      const bool timed = iptp.computeTimeStamps(rt, max_vel_scale_, max_acc_scale_);
+      trajectory_processing::TimeOptimalTrajectoryGeneration totg;
+      const bool timed = totg.computeTimeStamps(rt, max_vel_scale_, max_acc_scale_);
       if (!timed) {
         RCLCPP_WARN(this->get_logger(), "Time parameterization failed; executing un-timed trajectory.");
       } else {
@@ -223,7 +222,7 @@ private:
 
     // Execute
     moveit::planning_interface::MoveGroupInterface::Plan plan;
-    plan.trajectory_ = traj_msg;
+    plan.trajectory = traj_msg;
     auto exec_ok = (move_group_->execute(plan) == moveit::core::MoveItErrorCode::SUCCESS);
     RCLCPP_INFO(this->get_logger(), "Execute Cartesian path: %s", exec_ok ? "SUCCESS" : "FAIL");
     if (!exec_ok) {

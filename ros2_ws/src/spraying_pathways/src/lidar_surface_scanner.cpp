@@ -2,14 +2,14 @@
 #include <sensor_msgs/msg/point_cloud2.hpp>
 #include <sensor_msgs/msg/joint_state.hpp>
 #include <geometry_msgs/msg/pose.hpp>
-#include <moveit/move_group_interface/move_group_interface.h>
+#include <moveit/move_group_interface/move_group_interface.hpp>
 #include <moveit_msgs/msg/robot_trajectory.hpp>
 #include <pcl_conversions/pcl_conversions.h>
 #include <pcl/point_cloud.h>
 #include <pcl/point_types.h>
 #include <tf2_ros/transform_listener.h>
 #include <tf2_ros/buffer.h>
-#include <tf2_sensor_msgs/tf2_sensor_msgs.h>
+#include <tf2_sensor_msgs/tf2_sensor_msgs.hpp>
 #include <thread>
 #include <atomic>
 #include <tf2/LinearMath/Quaternion.h>
@@ -93,7 +93,7 @@ private:
     collecting_ = collect;
     moveit_msgs::msg::RobotTrajectory traj;
     double eef_step = 0.01, jump_thresh = 0.0;
-    double fraction = move_group->computeCartesianPath(waypoints, eef_step, jump_thresh, traj);
+    double fraction = move_group->computeCartesianPath(waypoints, eef_step,traj);
     if (fraction > 0.9) {
       RCLCPP_INFO(this->get_logger(), "Planned segment with %.1f%% success.", fraction * 100.0);
       double velocity_scaling = 0.025;
@@ -168,7 +168,7 @@ private:
     // Move to first joint position
     move_group->setJointValueTarget(joint_position_1);
     moveit::planning_interface::MoveGroupInterface::Plan plan1;
-    if (move_group->plan(plan1) == moveit::planning_interface::MoveItErrorCode::SUCCESS) {
+    if (move_group->plan(plan1) == moveit::core::MoveItErrorCode::SUCCESS) {
       move_group->execute(plan1);
       RCLCPP_INFO(this->get_logger(), "Moved to first joint position.");
     } else {
@@ -181,13 +181,13 @@ private:
     // Move to second joint position
     move_group->setJointValueTarget(joint_position_2);
     moveit::planning_interface::MoveGroupInterface::Plan plan2;
-    if (move_group->plan(plan2) == moveit::planning_interface::MoveItErrorCode::SUCCESS) {
+    if (move_group->plan(plan2) == moveit::core::MoveItErrorCode::SUCCESS) {
       
       // Scale down velocity and acceleration
       double velocity_scaling = 0.1;
       double time_scaling = 1.0 / velocity_scaling;
 
-      for (auto& point : plan2.trajectory_.joint_trajectory.points) {
+      for (auto& point : plan2.trajectory.joint_trajectory.points) {
         double t = point.time_from_start.sec + point.time_from_start.nanosec / 1e9;
         double scaled = t * time_scaling;
         point.time_from_start.sec = static_cast<int32_t>(scaled);
