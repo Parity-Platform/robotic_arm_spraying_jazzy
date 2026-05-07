@@ -276,7 +276,18 @@ class CombinedPipelineNode(Node):
         if stlmesh is None:
             self.get_logger().warn("numpy-stl not installed; cannot auto-measure mesh AABB.")
             return None, None
-        path = filename.replace("file://", "")
+        path = filename
+        if path.startswith("package://"):
+            from ament_index_python.packages import get_package_share_directory
+            remainder = path[len("package://"):]
+            pkg_name, _, rel_path = remainder.partition("/")
+            try:
+                path = os.path.join(get_package_share_directory(pkg_name), rel_path)
+            except Exception:
+                self.get_logger().warn(f"Cannot resolve package '{pkg_name}' for mesh '{filename}'")
+                return None, None
+        else:
+            path = path.replace("file://", "")
         if not path.lower().endswith(".stl"):
             self.get_logger().warn(f"Non-STL mesh '{path}' — skipping AABB")
             return None, None

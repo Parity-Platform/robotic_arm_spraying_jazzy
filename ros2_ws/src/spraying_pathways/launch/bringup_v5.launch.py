@@ -113,19 +113,22 @@ def launch_setup(context, *args, **kwargs):
         controllers = yaml.safe_load(f)
 
     robot_description_kinematics = {
-        "robot_description_kinematics": kinematics.get("/**", {})
-                                                        .get("ros__parameters", {})
-                                                        .get("robot_description_kinematics", {})
+        "robot_description_kinematics": kinematics
     }
 
     robot_description_planning = {
         "robot_description_planning": joint_limits
     }
-
     ompl_config = {
         "move_group": {
             "planning_plugin": "ompl_interface/OMPLPlanner",
-            "request_adapters": "",
+            "request_adapters": (
+                "default_planner_request_adapters/AddTimeOptimalParameterization "
+                "default_planner_request_adapters/FixWorkspaceBounds "
+                "default_planner_request_adapters/FixStartStateBounds "
+                "default_planner_request_adapters/FixStartStateCollision "
+                "default_planner_request_adapters/FixStartStatePathConstraints"
+            ),
             "start_state_max_bounds_error": 0.1,
             **ompl,
         }
@@ -205,7 +208,7 @@ def launch_setup(context, *args, **kwargs):
         package="rviz2",
         executable="rviz2",
         name="rviz2_moveit",
-        output="log",
+        output="screen",
         arguments=["-d", os.path.join(moveit_config_pkg, "rviz", "view_robot.rviz")],
         parameters=[
             robot_description,
