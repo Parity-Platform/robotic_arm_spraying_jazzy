@@ -209,7 +209,7 @@ def launch_setup(context, *args, **kwargs):
         executable="rviz2",
         name="rviz2_moveit",
         output="screen",
-        arguments=["-d", os.path.join(moveit_config_pkg, "rviz", "view_robot.rviz")],
+        arguments=["-d", os.path.join(moveit_config_pkg, "config", "moveit.rviz")],
         parameters=[
             robot_description,
             robot_description_semantic,
