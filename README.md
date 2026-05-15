@@ -154,6 +154,7 @@ cd Dockerfile
 docker image build -t my-vulcanexus:jazzy-desktop .
 
 # Run (from the repo root, where ros2_ws/ is located)
+xhost +local:docker # Required for X11 forwarding
 cd ..
 docker run -it --rm --name vulcanexus-container --user vulcanexus_user \
   -v $PWD/ros2_ws:/ros2_ws -w /ros2_ws \
@@ -168,7 +169,7 @@ docker run -it --rm --name vulcanexus-container --user vulcanexus_user \
 ```bash
 cd /ros2_ws
 rm -rf build/ log/ install/
-colcon build
+colcon build --executor sequential # Depending on system        memory, you might not need this flag
 source install/setup.bash
 rosdep update && rosdep install --ignore-src --from-paths . -y
 ```
