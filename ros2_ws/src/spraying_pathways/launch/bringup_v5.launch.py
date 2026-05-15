@@ -190,6 +190,17 @@ def launch_setup(context, *args, **kwargs):
         output="screen",
     )
 
+    ros2_control_node = Node(
+        package="controller_manager",
+        executable="ros2_control_node",
+        parameters=[
+            robot_description,
+            initial_joint_controllers,
+            {"use_sim_time": True},
+        ],
+        output="screen",
+    )
+
     move_group_node = Node(
         package="moveit_ros_move_group",
         executable="move_group",
@@ -257,6 +268,7 @@ def launch_setup(context, *args, **kwargs):
         gzserver,
         gz_bridge_node,
         robot_state_publisher_node,
+        ros2_control_node,
         joint_state_broadcaster,
         initial_joint_controller_start,
         initial_joint_controller_stop,

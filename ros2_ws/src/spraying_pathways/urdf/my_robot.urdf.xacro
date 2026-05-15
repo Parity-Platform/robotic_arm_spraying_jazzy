@@ -26,4 +26,41 @@
   <xacro:depth_camera parent_link="$(arg tf_prefix)base_link" sim_gazebo="$(arg sim_gazebo)" />
   <xacro:depth_camera_ee parent_link="$(arg tf_prefix)wrist_3_link" sim_gazebo="$(arg sim_gazebo)" />
   <!-- <xacro:lidar_sensor parent_link="$(arg tf_prefix)tool0" tf_prefix="$(arg tf_prefix)" sim_gazebo="$(arg sim_gazebo)" /> -->
+
+  <ros2_control name="MockSystem" type="system">
+    <hardware>
+      <plugin>mock_components/GenericSystem</plugin>
+      <param name="calculate_dynamics">true</param>
+    </hardware>
+    <joint name="$(arg tf_prefix)shoulder_pan_joint">
+      <command_interface name="position"/>
+      <state_interface name="position"><param name="initial_value">0.0</param></state_interface>
+      <state_interface name="velocity"/>
+    </joint>
+    <joint name="$(arg tf_prefix)shoulder_lift_joint">
+      <command_interface name="position"/>
+      <state_interface name="position"><param name="initial_value">-1.5708</param></state_interface>
+      <state_interface name="velocity"/>
+    </joint>
+    <joint name="$(arg tf_prefix)elbow_joint">
+      <command_interface name="position"/>
+      <state_interface name="position"><param name="initial_value">0.0</param></state_interface>
+      <state_interface name="velocity"/>
+    </joint>
+    <joint name="$(arg tf_prefix)wrist_1_joint">
+      <command_interface name="position"/>
+      <state_interface name="position"><param name="initial_value">-1.5708</param></state_interface>
+      <state_interface name="velocity"/>
+    </joint>
+    <joint name="$(arg tf_prefix)wrist_2_joint">
+      <command_interface name="position"/>
+      <state_interface name="position"><param name="initial_value">0.0</param></state_interface>
+      <state_interface name="velocity"/>
+    </joint>
+    <joint name="$(arg tf_prefix)wrist_3_joint">
+      <command_interface name="position"/>
+      <state_interface name="position"><param name="initial_value">0.0</param></state_interface>
+      <state_interface name="velocity"/>
+    </joint>
+  </ros2_control>
 </robot>
