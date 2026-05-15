@@ -240,7 +240,7 @@ def launch_setup(context, *args, **kwargs):
         PythonLaunchDescriptionSource([
             PathJoinSubstitution([FindPackageShare("ros_gz_sim"), "launch", "gz_sim.launch.py"])
         ]),
-        launch_arguments={"gz_args": ["-r ", world_file]}.items()
+        launch_arguments={"gz_args": ["-r --render-engine ogre ", world_file]}.items() # render engine might be different based on setup
     )
 
     # Sensor topic bridge (Gz <-> ROS 2)
