@@ -25,9 +25,7 @@ After launching the container for the first time, you need to perform some initi
 
 ```bash
 rm -rf build/ log/ install/
-colcon build
-
-source /opt/ros/jazzy/setup.bash
+colcon build --symlink-install
 source install/setup.bash
 
 rosdep update && rosdep install --ignore-src --from-paths . -y
@@ -38,8 +36,6 @@ rosdep update && rosdep install --ignore-src --from-paths . -y
 
 ```bash
 docker exec -it vulcanexus-container /bin/bash
-
-source /opt/ros/jazzy/setup.bash
 source install/setup.bash
 ```
 
@@ -50,8 +46,6 @@ Every time you make changes to the workspace files inside the container — such
 ```bash
 rm -rf build/ log/ install/
 colcon build
-
-source /opt/ros/jazzy/setup.bash
 source install/setup.bash
 ```
 

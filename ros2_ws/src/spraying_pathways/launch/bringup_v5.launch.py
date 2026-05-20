@@ -113,19 +113,26 @@ def launch_setup(context, *args, **kwargs):
         controllers = yaml.safe_load(f)
 
     robot_description_kinematics = {
-        "robot_description_kinematics": kinematics.get("/**", {})
-                                                        .get("ros__parameters", {})
-                                                        .get("robot_description_kinematics", {})
+        "robot_description_kinematics": kinematics
     }
 
     robot_description_planning = {
         "robot_description_planning": joint_limits
     }
-
     ompl_config = {
         "move_group": {
-            "planning_plugin": "ompl_interface/OMPLPlanner",
-            "request_adapters": "",
+            "planning_plugins": ["ompl_interface/OMPLPlanner"],
+            "request_adapters": [
+                "default_planning_request_adapters/ResolveConstraintFrames",
+                "default_planning_request_adapters/ValidateWorkspaceBounds",
+                "default_planning_request_adapters/CheckStartStateBounds",
+                "default_planning_request_adapters/CheckStartStateCollision",
+            ],
+            "response_adapters": [
+                "default_planning_response_adapters/AddTimeOptimalParameterization",
+                "default_planning_response_adapters/ValidateSolution",
+                "default_planning_response_adapters/DisplayMotionPath",
+            ],
             "start_state_max_bounds_error": 0.1,
             **ompl,
         }
@@ -183,6 +190,17 @@ def launch_setup(context, *args, **kwargs):
         output="screen",
     )
 
+    ros2_control_node = Node(
+        package="controller_manager",
+        executable="ros2_control_node",
+        parameters=[
+            robot_description,
+            initial_joint_controllers,
+            {"use_sim_time": True},
+        ],
+        output="screen",
+    )
+
     move_group_node = Node(
         package="moveit_ros_move_group",
         executable="move_group",
@@ -205,8 +223,8 @@ def launch_setup(context, *args, **kwargs):
         package="rviz2",
         executable="rviz2",
         name="rviz2_moveit",
-        output="log",
-        arguments=["-d", os.path.join(moveit_config_pkg, "rviz", "view_robot.rviz")],
+        output="screen",
+        arguments=["-d", os.path.join(moveit_config_pkg, "config", "moveit.rviz")],
         parameters=[
             robot_description,
             robot_description_semantic,
@@ -222,8 +240,7 @@ def launch_setup(context, *args, **kwargs):
         PythonLaunchDescriptionSource([
             PathJoinSubstitution([FindPackageShare("ros_gz_sim"), "launch", "gz_sim.launch.py"])
         ]),
-        launch_arguments={"world_sdf_file": world_file,
-        }.items()
+        launch_arguments={"gz_args": ["-r --render-engine ogre ", world_file]}.items() # render engine might be different based on setup
     )
 
     # Sensor topic bridge (Gz <-> ROS 2)
@@ -251,6 +268,7 @@ def launch_setup(context, *args, **kwargs):
         gzserver,
         gz_bridge_node,
         robot_state_publisher_node,
+        ros2_control_node,
         joint_state_broadcaster,
         initial_joint_controller_start,
         initial_joint_controller_stop,

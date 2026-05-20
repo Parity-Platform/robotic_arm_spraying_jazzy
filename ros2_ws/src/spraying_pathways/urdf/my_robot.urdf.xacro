@@ -23,7 +23,52 @@
   <!-- <xacro:include filename="$(find spraying_pathways)/urdf/2d_lidar.urdf.xacro" /> -->
   
   <!-- Custom sensors -->
-  <xacro:depth_camera parent_link="$(arg tf_prefix)base_link" sim_gazebo="$(arg sim_gazebo)" />
-  <xacro:depth_camera_ee parent_link="$(arg tf_prefix)wrist_3_link" sim_gazebo="$(arg sim_gazebo)" />
-  <!-- <xacro:lidar_sensor parent_link="$(arg tf_prefix)tool0" tf_prefix="$(arg tf_prefix)" sim_gazebo="$(arg sim_gazebo)" /> -->
+  <xacro:depth_camera parent_link="$(arg prefix)base_link" sim_gazebo="$(arg sim_gazebo)" />
+  <xacro:depth_camera_ee parent_link="$(arg prefix)wrist_3_link" sim_gazebo="$(arg sim_gazebo)" />
+  <!-- <xacro:lidar_sensor parent_link="$(arg prefix)tool0" tf_prefix="$(arg prefix)" sim_gazebo="$(arg sim_gazebo)" /> -->
+
+  <ros2_control name="GazeboSimSystem" type="system">
+    <hardware>
+      <plugin>gz_ros2_control/GazeboSimSystem</plugin>
+    </hardware>
+    <joint name="$(arg prefix)shoulder_pan_joint">
+      <command_interface name="position"/>
+      <state_interface name="position"><param name="initial_value">0.0</param></state_interface>
+      <state_interface name="velocity"/>
+    </joint>
+    <joint name="$(arg prefix)shoulder_lift_joint">
+      <command_interface name="position"/>
+      <state_interface name="position"><param name="initial_value">-1.5708</param></state_interface>
+      <state_interface name="velocity"/>
+    </joint>
+    <joint name="$(arg prefix)elbow_joint">
+      <command_interface name="position"/>
+      <state_interface name="position"><param name="initial_value">0.0</param></state_interface>
+      <state_interface name="velocity"/>
+    </joint>
+    <joint name="$(arg prefix)wrist_1_joint">
+      <command_interface name="position"/>
+      <state_interface name="position"><param name="initial_value">-1.5708</param></state_interface>
+      <state_interface name="velocity"/>
+    </joint>
+    <joint name="$(arg prefix)wrist_2_joint">
+      <command_interface name="position"/>
+      <state_interface name="position"><param name="initial_value">0.0</param></state_interface>
+      <state_interface name="velocity"/>
+    </joint>
+    <joint name="$(arg prefix)wrist_3_joint">
+      <command_interface name="position"/>
+      <state_interface name="position"><param name="initial_value">0.0</param></state_interface>
+      <state_interface name="velocity"/>
+    </joint>
+  </ros2_control>
+
+
+
+  <gazebo>
+    <plugin filename="libgz_ros2_control-system.so" name="gz_ros2_control::GazeboSimROS2ControlPlugin">
+      <parameters>$(arg simulation_controllers)</parameters>
+    </plugin>
+  </gazebo>
+
 </robot>

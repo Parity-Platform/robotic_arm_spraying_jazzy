@@ -6,7 +6,7 @@ Autonomous epoxy spraying workcell for composite panel coating, developed by Par
 
 ## Stack
 
-- ROS 2 Jazzy on Vulcanexus
+- ROS 2 Jazzy on Vulcanexus (previously ROS 2 Humble, migration bugs present)
 - Gz Harmonic (not Gazebo Classic - this matters for all simulation plugins and URDF sensors)
 - MoveIt 2 for motion planning
 - gz_ros2_control for joint control in simulation
