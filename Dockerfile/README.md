@@ -75,6 +75,36 @@ ros2 launch spraying_pathways bringup_v5.launch.py
 ros2 run spraying_pathways go_home_node
 ```
 
+## Executing the Flat-Fan Spray with Progressive Visualisation
+
+Make sure the robot is at its home position before starting.
+
+**Step 1** -- Start the epoxy coating visualiser (open a new terminal first):
+```bash
+ros2 run spraying_pathways epoxy_visualizer.py
+```
+
+In RViz: click **Add** → **MarkerArray** → set the topic to `/epoxy_coating_markers`.
+
+**Step 2** -- Run the spraying node:
+```bash
+ros2 run spraying_pathways flat_fan_spraying_v4_node
+```
+
+Coloured cubes will appear on the panel in RViz in real time as the robot moves over each grid cell. The colour encodes how many times that cell has been coated:
+
+| Colour | Layer count |
+|--------|-------------|
+| Yellow (semi-transparent) | 1 |
+| Orange | 2 |
+| Deep orange | 3 |
+| Dark red | 4+ |
+
+Each additional run of `flat_fan_spraying_v4_node` adds another layer on top. Layer data is saved to `/tmp/epoxy_layers.json` between runs. To reset all layer history:
+```bash
+rm /tmp/epoxy_layers.json
+```
+
 ## Executing Surface Scan or Scan & Glue Spraying
 
 Before running any of the commands below, make sure the robot is already at its home position.

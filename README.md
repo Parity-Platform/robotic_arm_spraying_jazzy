@@ -52,7 +52,7 @@ Core package containing all planning, spraying, sensing, and simulation assets.
 #### C++ Nodes
 
 **Spraying nodes** (latest: flat_fan_spraying_v4):
-- `flat_fan_spraying_v4_node` -- Main spraying controller. Generates flat-fan spray grids over the target surface using coverage-optimised waypoints, executes multi-line trajectories with cubic/quintic velocity profiles and Bezier curve direction changes. Tracks per-pass coverage.
+- `flat_fan_spraying_v4_node` -- Main spraying controller. Generates flat-fan spray grids over the target surface using coverage-optimised waypoints, executes multi-line trajectories with cubic/quintic velocity profiles and Bezier curve direction changes. Tracks per-pass coverage. Publishes `/spray_plan` (grid layout, transient-local QoS) and `/spray_current_idx` (active spray centre, 4 Hz) for use by `epoxy_visualizer.py`. Includes `UnknownGate` obstacle watchdog with pause-resume execution.
 - `flat_fan_spraying_v3_node`, `v2`, `v1` -- Earlier iterations retained for reference.
 
 **Path planning nodes** (latest: cartesian_path_planner_cubes_v4):
@@ -78,6 +78,7 @@ Located in `include/spraying_pathways/`:
 
 #### Python Scripts
 
+- `epoxy_visualizer.py` -- Progressive RViz coating visualiser. Subscribes to `/spray_plan` (grid layout, published once by `flat_fan_spraying_v4_node`) and `/spray_current_idx` (active spray centre index, published every 250 ms during execution). Publishes a `MarkerArray` on `/epoxy_coating_markers` showing coloured cubes that grow in real time as the robot sprays. Layer counts are persisted to `/tmp/epoxy_layers.json` so successive runs accumulate visually (yellow → orange → deep orange → dark red). Text labels `L2`, `L3`, etc. appear above cells with more than one layer. Reset with `rm /tmp/epoxy_layers.json`.
 - `pointcloud_transform_and_unknown_filter_v3.py` -- Transforms depth camera point clouds to base_link, parses the Gz world file for known geometry, separates unknown objects. Used in bringup_v5 launch.
 - `obstacles_tracking.py` -- DBSCAN clustering on the unknown points cloud. Publishes obstacle centroids as visualisation markers. Can cancel active FollowJointTrajectory goals.
 - `unknown_object_detector.py` -- Parses world SDF for known objects and robot URDF for collision geometry. Publishes markers for both.
@@ -196,9 +197,21 @@ Terminal 2 -- Send robot to home position:
 ros2 run spraying_pathways go_home_node
 ```
 
-Terminal 3 -- Execute spraying:
+Terminal 3 -- Start the progressive coating visualiser (before the spray node so it is ready):
+```bash
+ros2 run spraying_pathways epoxy_visualizer.py
+```
+
+In RViz: click **Add** → **MarkerArray** → set topic to `/epoxy_coating_markers`.
+
+Terminal 4 -- Execute spraying:
 ```bash
 ros2 run spraying_pathways flat_fan_spraying_v4_node
+```
+
+Coloured cubes appear on the panel in RViz as the robot moves over each cell. Run the spray node again without restarting the visualiser to add a second layer (colours shift yellow → orange → red). Reset accumulated layers with:
+```bash
+rm /tmp/epoxy_layers.json
 ```
 
 ### Opening Additional Terminals
@@ -225,6 +238,9 @@ The integration point is the `/rapseb/spray_status` topic (std_msgs/String, JSON
 | /wrist_camera/points | sensor_msgs/PointCloud2 | ros_gz_bridge | Wrist depth camera point cloud |
 | /unknown_points | sensor_msgs/PointCloud2 | pointcloud filter | Unclassified points (potential obstacles) |
 | scan_cloud | sensor_msgs/PointCloud2 | lidar_surface_scanner | Accumulated scan result |
+| /spray_plan | std_msgs/Float64MultiArray | flat_fan_spraying_v4 | Grid layout: [size_x, size_y, N, x0, y0, x1, y1, ...]. Transient-local QoS. |
+| /spray_current_idx | std_msgs/Int32 | flat_fan_spraying_v4 | Index of spray centre nearest the end-effector, published at ~4 Hz during execution |
+| /epoxy_coating_markers | visualization_msgs/MarkerArray | epoxy_visualizer | Live RViz coating cubes coloured by layer count |
 | /rapseb/robot_mode | std_msgs/String | hri_safety_guard | NORMAL, REDUCED, or STOPPED |
 | /rapseb/spray_status | std_msgs/String | spraying nodes | JSON spray events (FIWARE integration) |
 | /humans/bodies/tracked | hri_msgs/IdsList | ros4hri | Tracked human body IDs |

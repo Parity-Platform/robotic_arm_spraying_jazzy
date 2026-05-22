@@ -4,11 +4,17 @@
 #include "ament_index_cpp/get_package_share_directory.hpp"
 #include <yaml-cpp/yaml.h>
 #include <fstream>
+#include <thread>
 
 int main(int argc, char **argv)
 {
   rclcpp::init(argc, argv);
   auto node = rclcpp::Node::make_shared("go_home_node");
+
+  auto executor = std::make_shared<rclcpp::executors::SingleThreadedExecutor>();
+  executor->add_node(node);
+  std::thread executor_thread([&executor]() { executor->spin(); });
+
   double max_vel = node->declare_parameter("max_velocity", 0.1);
   double max_acc = node->declare_parameter("max_acceleration", 0.05);
   double plan_time = node->declare_parameter("planning_time", 10.0);
@@ -61,6 +67,8 @@ int main(int argc, char **argv)
   {
     RCLCPP_ERROR(node->get_logger(), "Planning failed.");
   }
+  executor->cancel();
+  executor_thread.join();
   rclcpp::shutdown();
   return 0;
 }
