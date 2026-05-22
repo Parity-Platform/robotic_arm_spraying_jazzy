@@ -56,12 +56,14 @@ int main(int argc, char **argv)
   std::vector<double> home_joint_values = {0.0, -2.15, 2.15, -1.57, -1.57, 0.0};
   move_group.setJointValueTarget(home_joint_values);
   moveit::planning_interface::MoveGroupInterface::Plan plan;
-  bool success = (move_group.plan(plan) == moveit::core::MoveItErrorCode::SUCCESS);
-  
-  if (success)
+  auto plan_result = move_group.plan(plan);
+
+  if (plan_result == moveit::core::MoveItErrorCode::SUCCESS)
   {
-    RCLCPP_INFO(node->get_logger(), "Plan successful. Executing...");
-    move_group.move();
+    RCLCPP_INFO(node->get_logger(), "Plan found. Executing...");
+    auto exec_result = move_group.execute(plan);
+    if (exec_result != moveit::core::MoveItErrorCode::SUCCESS)
+      RCLCPP_ERROR(node->get_logger(), "Execution failed.");
   }
   else
   {

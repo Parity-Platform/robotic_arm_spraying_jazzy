@@ -915,6 +915,9 @@ int main(int argc, char** argv) {
         }
     });
 
+    // Let the controller settle after the initial move-to-start-point execution
+    std::this_thread::sleep_for(std::chrono::milliseconds(600));
+
     // === Εκτέλεση με stop/resume ===
     RCLCPP_INFO(node->get_logger(), "Executing FK-time-mapped trajectory...");
     execute_with_pause_resume(move_group, msg, gate, planning_group);
