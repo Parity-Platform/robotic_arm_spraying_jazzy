@@ -433,8 +433,8 @@ public:
   : node_(node)
   {
     unknown_topic_   = node_->declare_parameter<std::string>("unknown_topic", "/unknown_points");
-    min_points_      = node_->declare_parameter<int>("min_points", 1);
-    debounce_ms_     = node_->declare_parameter<int>("debounce_ms", 200);
+    min_points_      = node_->declare_parameter<int>("min_points", 50);
+    debounce_ms_     = node_->declare_parameter<int>("debounce_ms", 1000);
     controller_ns_   = node_->declare_parameter<std::string>("controller_ns", "joint_trajectory_controller");
 
     auto qos = rclcpp::QoS(rclcpp::KeepLast(10)).reliable();
@@ -611,7 +611,7 @@ static void execute_with_pause_resume(
 
     // start_state = τρέχουσα στάση (βοηθά στα tolerances)
     {
-      moveit::core::RobotStatePtr st = mgi.getCurrentState(0.2);
+      moveit::core::RobotStatePtr st = mgi.getCurrentState(2.0);
       moveit::core::robotStateToRobotStateMsg(*st, plan2.start_state);
     }
 

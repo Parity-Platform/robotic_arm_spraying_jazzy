@@ -3,9 +3,11 @@ from launch.actions import (
     DeclareLaunchArgument,
     IncludeLaunchDescription,
     OpaqueFunction,
+    RegisterEventHandler,
     TimerAction,
     ExecuteProcess
 )
+from launch.event_handlers import OnProcessExit
 from launch.conditions import IfCondition, UnlessCondition
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import (
@@ -264,15 +266,24 @@ def launch_setup(context, *args, **kwargs):
     )
 
 
+    spawn_controllers = RegisterEventHandler(
+        OnProcessExit(
+            target_action=spawn_ur,
+            on_exit=[
+                joint_state_broadcaster,
+                initial_joint_controller_start,
+                initial_joint_controller_stop,
+            ],
+        )
+    )
+
     return [
         gzserver,
         gz_bridge_node,
         robot_state_publisher_node,
         ros2_control_node,
-        joint_state_broadcaster,
-        initial_joint_controller_start,
-        initial_joint_controller_stop,
         spawn_ur,
+        spawn_controllers,
         move_group_node,
         rviz_node,
         pointcloud_transform_and_unknown_filter_script,
