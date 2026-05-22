@@ -21,14 +21,21 @@ docker run -it --rm --name vulcanexus-container --user vulcanexus_user \
 
 ## First-Time Container Setup
 
-After launching the container for the first time, you need to perform some initial setup steps inside the container. These commands should be executed inside the `/ros2_ws` directory.
+Clone `gz_ros2_control` from source before building. The apt package (1.2.17) has a threading bug in `GazeboSimSystem::initSim`; the source build from the jazzy branch fixes it. Run this on the **host** (not inside the container), from the repo root:
 
 ```bash
-rm -rf build/ log/ install/
-colcon build --symlink-install
-source install/setup.bash
+cd ros2_ws/src
+git clone https://github.com/ros-controls/gz_ros2_control.git --branch jazzy --depth 1 gz_ros2_control
+```
 
+Then inside the container:
+
+```bash
+cd /ros2_ws
+rm -rf build/ log/ install/
 rosdep update && rosdep install --ignore-src --from-paths . -y
+colcon build --symlink-install --executor sequential
+source install/setup.bash
 ```
 
 ## Opening a New Terminal Inside the Running Container
@@ -45,7 +52,7 @@ Every time you make changes to the workspace files inside the container — such
 
 ```bash
 rm -rf build/ log/ install/
-colcon build
+colcon build --symlink-install --executor sequential
 source install/setup.bash
 ```
 
@@ -59,7 +66,7 @@ ros2 launch ur_description view_ur.launch.py ur_type:=ur10
 ## Launching the Robot in Gazebo using `spraying_pathways` package with custom World and custom Urdf file
 
 ```bash
-ros2 launch spraying_pathways bringup_v4.launch.py
+ros2 launch spraying_pathways bringup_v5.launch.py
 ```
 
 ## Sending the Robot to its Home Position

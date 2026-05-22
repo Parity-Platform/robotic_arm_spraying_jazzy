@@ -41,17 +41,6 @@ RUN apt-get update && apt-get install -y \
     build-essential \
     && rm -rf /var/lib/apt/lists/*
 
-# Build gz_ros2_control from source (apt 1.2.17 has a threading bug in GazeboSimSystem::initSim)
-RUN bash -c "\
-    source /opt/vulcanexus/jazzy/setup.bash && \
-    mkdir -p /opt/gz_ros2_control_ws/src && \
-    git clone https://github.com/ros-controls/gz_ros2_control.git \
-        --branch jazzy --depth 1 \
-        /opt/gz_ros2_control_ws/src/gz_ros2_control && \
-    cd /opt/gz_ros2_control_ws && \
-    colcon build --cmake-args -DCMAKE_BUILD_TYPE=Release && \
-    chmod -R a+rX /opt/gz_ros2_control_ws/install"
-
 # Python tooling + deps for numpy-stl
 RUN apt-get update && apt-get install -y \
     python3-pip \
@@ -68,8 +57,7 @@ RUN usermod -l $USERNAME ubuntu && \
     chmod 0440 /etc/sudoers.d/$USERNAME
 
 # Auto-source Vulcanexus environment for every new terminal
-RUN echo "source /opt/vulcanexus/jazzy/setup.bash" >> /home/${USERNAME}/.bashrc && \
-    echo "source /opt/gz_ros2_control_ws/install/setup.bash" >> /home/${USERNAME}/.bashrc
+RUN echo "source /opt/vulcanexus/jazzy/setup.bash" >> /home/${USERNAME}/.bashrc
 
 # Switch to the non-root user
 USER ${USERNAME}

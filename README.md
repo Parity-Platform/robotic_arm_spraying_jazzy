@@ -23,6 +23,7 @@ robotic_arm_spraying_jazzy/
     README.md                     # Build, run, and usage instructions
   ros2_ws/
     src/
+      gz_ros2_control/            # gz_ros2_control built from source (jazzy branch)
       spraying_pathways/          # Main package: planning, spraying, sensing
         src/                      # C++ nodes (20 executables)
         scripts/                  # Python nodes and utilities
@@ -154,7 +155,7 @@ cd Dockerfile
 docker image build -t my-vulcanexus:jazzy-desktop .
 
 # Run (from the repo root, where ros2_ws/ is located)
-xhost +local:docker # Required for X11 forwarding
+xhost +local:docker # Required for X11 forwarding (not wsl2)
 cd ..
 docker run -it --rm --name vulcanexus-container --user vulcanexus_user \
   -v $PWD/ros2_ws:/ros2_ws -w /ros2_ws \
@@ -164,14 +165,23 @@ docker run -it --rm --name vulcanexus-container --user vulcanexus_user \
   my-vulcanexus:jazzy-desktop
 ```
 
-### First-Time Setup (inside container)
+### First-Time Setup
+
+Clone `gz_ros2_control` from source into the workspace before building. The apt package (1.2.17) has a threading bug in `GazeboSimSystem::initSim`; the source build from the jazzy branch fixes it.
+
+```bash
+cd ros2_ws/src
+git clone https://github.com/ros-controls/gz_ros2_control.git --branch jazzy --depth 1 gz_ros2_control
+```
+
+Then build inside the container:
 
 ```bash
 cd /ros2_ws
 rm -rf build/ log/ install/
-colcon build --executor sequential # Depending on system        memory, you might not need this flag
-source install/setup.bash
 rosdep update && rosdep install --ignore-src --from-paths . -y
+colcon build --symlink-install --parallel-workers 1 --executor sequential # Depending on system memory, you might not need the flags
+source install/setup.bash
 ```
 
 ### Running the Simulation
