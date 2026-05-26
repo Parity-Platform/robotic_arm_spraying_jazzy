@@ -344,6 +344,6 @@ def generate_launch_description():
         DeclareLaunchArgument("moveit_config_file", default_value="ur.srdf.xacro"),
         DeclareLaunchArgument("world_file", default_value="/ros2_ws/src/spraying_pathways/worlds/table_world.world"),
         DeclareLaunchArgument("publish_robot_description_semantic", default_value="true", description="Whether to publish the SRDF description on /robot_description_semantic."),
-        DeclareLaunchArgument("render_engine", default_value="ogre2", description="Gazebo render engine. ogre2 required for depth_camera sensor. Use ogre if ogre2 crashes on your setup (depth camera will not work)."),
+        DeclareLaunchArgument("render_engine", default_value="ogre", description="Gazebo render engine. Use ogre2 if ogre crashes on your setup (depth camera might not work)."),
         OpaqueFunction(function=launch_setup),
     ])
