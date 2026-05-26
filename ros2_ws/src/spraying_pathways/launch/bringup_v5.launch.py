@@ -43,6 +43,7 @@ def launch_setup(context, *args, **kwargs):
     moveit_config_package = LaunchConfiguration("moveit_config_package")
     moveit_config_file = LaunchConfiguration("moveit_config_file")
     publish_robot_description_semantic = LaunchConfiguration("publish_robot_description_semantic")
+    render_engine = LaunchConfiguration("render_engine")
 
     # Robot description
     initial_joint_controllers = PathJoinSubstitution([
@@ -147,9 +148,9 @@ def launch_setup(context, *args, **kwargs):
 
     trajectory_execution = {
         "moveit_manage_controllers": False,
-        "trajectory_execution.allowed_execution_duration_scaling": 1.2,
-        "trajectory_execution.allowed_goal_duration_margin": 0.5,
-        "trajectory_execution.allowed_start_tolerance": 0.01,
+        "trajectory_execution.allowed_execution_duration_scaling": 10.0,
+        "trajectory_execution.allowed_goal_duration_margin": 10.0,
+        "trajectory_execution.allowed_start_tolerance": 0.05,
         "trajectory_execution.execution_duration_monitoring": False,
     }
 
@@ -242,7 +243,7 @@ def launch_setup(context, *args, **kwargs):
         PythonLaunchDescriptionSource([
             PathJoinSubstitution([FindPackageShare("ros_gz_sim"), "launch", "gz_sim.launch.py"])
         ]),
-        launch_arguments={"gz_args": ["-r --render-engine ogre ", world_file]}.items() # render engine might be different based on setup
+        launch_arguments={"gz_args": ["-r --render-engine ", render_engine, " ", world_file]}.items() # ogre2 needed for depth_camera sensor; use ogre if ogre2 crashes
     )
 
     # Sensor topic bridge (Gz <-> ROS 2)
@@ -264,6 +265,36 @@ def launch_setup(context, *args, **kwargs):
             )
         ]
     )
+
+    # Starts after the transform node (10s) so /unknown_points is already flowing
+    obstacles_tracking_node = TimerAction(
+        period=13.0,
+        actions=[
+            Node(
+                package="spraying_pathways",
+                executable="obstacles_tracking.py",
+                name="obstacles_tracking",
+                output="screen",
+                parameters=[{"use_sim_time": True}],
+            )
+        ]
+    )
+
+    # Waits for /spray_plan and /spray_current_idx from the spraying C++ node
+    epoxy_visualizer_node = TimerAction(
+        period=5.0,
+        actions=[
+            Node(
+                package="spraying_pathways",
+                executable="epoxy_visualizer.py",
+                name="epoxy_visualizer",
+                output="screen",
+                parameters=[{"use_sim_time": True}],
+            )
+        ]
+    )
+
+
 
 
     spawn_controllers = RegisterEventHandler(
@@ -287,6 +318,8 @@ def launch_setup(context, *args, **kwargs):
         move_group_node,
         rviz_node,
         pointcloud_transform_and_unknown_filter_script,
+        obstacles_tracking_node,
+        epoxy_visualizer_node,
     ]
 
 
@@ -311,5 +344,6 @@ def generate_launch_description():
         DeclareLaunchArgument("moveit_config_file", default_value="ur.srdf.xacro"),
         DeclareLaunchArgument("world_file", default_value="/ros2_ws/src/spraying_pathways/worlds/table_world.world"),
         DeclareLaunchArgument("publish_robot_description_semantic", default_value="true", description="Whether to publish the SRDF description on /robot_description_semantic."),
+        DeclareLaunchArgument("render_engine", default_value="ogre2", description="Gazebo render engine. ogre2 required for depth_camera sensor. Use ogre if ogre2 crashes on your setup (depth camera will not work)."),
         OpaqueFunction(function=launch_setup),
     ])

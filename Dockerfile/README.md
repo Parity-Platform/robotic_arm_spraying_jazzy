@@ -79,19 +79,23 @@ ros2 run spraying_pathways go_home_node
 
 Make sure the robot is at its home position before starting.
 
-**Step 1** -- Start the epoxy coating visualiser (open a new terminal first):
-```bash
-ros2 run spraying_pathways epoxy_visualizer.py
-```
+The epoxy visualiser and obstacle tracking nodes now start automatically as part of `bringup_v5.launch.py`. No separate terminal is needed for them.
 
-In RViz: click **Add** → **MarkerArray** → set the topic to `/epoxy_coating_markers`.
-
-**Step 2** -- Run the spraying node:
+Run the spraying node:
 ```bash
 ros2 run spraying_pathways flat_fan_spraying_v4_node
 ```
 
-Coloured cubes will appear on the panel in RViz in real time as the robot moves over each grid cell. The colour encodes how many times that cell has been coated:
+In RViz: click **Add** → **MarkerArray** and add these topics:
+
+| Topic | What you see |
+|-------|-------------|
+| `/epoxy_coating_markers` | Coloured cubes on the panel growing in real time |
+| `/obstacle_centroids` | Red spheres at detected obstacle positions |
+| `/known_objects_markers` | Green shapes (table, panel -- already known) |
+| `/robot_objects_markers` | Blue shapes (robot self-filter volumes) |
+
+Cube colours encode how many times each cell has been coated:
 
 | Colour | Layer count |
 |--------|-------------|

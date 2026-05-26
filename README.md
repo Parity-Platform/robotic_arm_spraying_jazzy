@@ -9,8 +9,9 @@ The workcell operates as a closed-loop spraying pipeline:
 1. **Surface scanning** -- Depth cameras and LiDAR acquire the panel geometry and build a 3D point cloud of the workspace.
 2. **Path planning** -- MoveIt 2 computes Cartesian spray trajectories over the panel surface, using flat-fan coverage grids with velocity-profiled motion.
 3. **Spraying execution** -- The UR10e follows the planned trajectory while the flat-fan nozzle deposits epoxy. Pass coverage is tracked incrementally.
-4. **Obstacle monitoring** -- Point cloud filtering separates known geometry (table, panel, robot) from unknown objects. DBSCAN clustering detects obstacles and triggers protective stops.
-5. **HRI safety (optional)** -- A separate node monitors human proximity via ros4hri and enforces ISO 10218 safety zones.
+4. **Obstacle monitoring** -- Point cloud filtering separates known geometry (table, panel, robot) from unknown objects. DBSCAN clustering detects obstacle clusters and triggers protective stops. The spraying node includes a pause/resume gate that halts execution while unknown points are present and resumes from the nearest trajectory point once the hazard clears.
+5. **Collision avoidance (in progress)** -- Detected obstacle clusters will be fed into MoveIt's planning scene as collision objects, allowing the planner to route around dynamic obstacles instead of only stopping. See `collision_scene_manager.py` (planned).
+6. **HRI safety (optional)** -- A separate node monitors human proximity via ros4hri and enforces ISO 10218 safety zones.
 
 The pipeline runs inside a Vulcanexus Jazzy Docker container. Gz Harmonic provides physics simulation with depth camera and LiDAR sensor emulation. The ros_gz_bridge forwards sensor data between Gz transport and ROS 2 topics.
 
@@ -113,7 +114,7 @@ Located in `include/spraying_pathways/`:
 
 #### Launch Files
 
-- **bringup_v5.launch.py** (recommended) -- Full pipeline: robot description, MoveIt config, Gz Harmonic simulation, ros_gz_bridge, RViz, and point cloud processing.
+- **bringup_v5.launch.py** (recommended) -- Full pipeline: robot description, MoveIt config, Gz Harmonic simulation, ros_gz_bridge, RViz, point cloud processing, obstacle tracking, and epoxy visualiser. Node startup sequence: Gz + RViz + MoveIt at t=0s, epoxy visualiser at t=5s, point cloud filter at t=10s, obstacle tracking at t=13s.
 - **bringup_v4.launch.py** -- Previous version, uses point cloud transform node.
 - **bringup_v3.launch.py** -- Adds ros_gz_bridge.
 - **bringup_v2.launch.py**, **bringup.launch.py** -- Earlier iterations.
@@ -192,22 +193,23 @@ Terminal 1 -- Launch the full pipeline:
 ros2 launch spraying_pathways bringup_v5.launch.py
 ```
 
+This starts everything automatically, including the epoxy visualiser and obstacle tracking. Wait for the system to fully initialise (~15 seconds) before proceeding.
+
 Terminal 2 -- Send robot to home position:
 ```bash
 ros2 run spraying_pathways go_home_node
 ```
 
-Terminal 3 -- Start the progressive coating visualiser (before the spray node so it is ready):
-```bash
-ros2 run spraying_pathways epoxy_visualizer.py
-```
-
-In RViz: click **Add** → **MarkerArray** → set topic to `/epoxy_coating_markers`.
-
-Terminal 4 -- Execute spraying:
+Terminal 3 -- Execute spraying:
 ```bash
 ros2 run spraying_pathways flat_fan_spraying_v4_node
 ```
+
+In RViz: click **Add** → **MarkerArray** and add the following topics to see the full pipeline:
+- `/epoxy_coating_markers` -- progressive coating visualisation
+- `/obstacle_centroids` -- detected obstacles (red spheres)
+- `/known_objects_markers` -- known world geometry (green)
+- `/robot_objects_markers` -- robot self-filter volumes (blue)
 
 Coloured cubes appear on the panel in RViz as the robot moves over each cell. Run the spray node again without restarting the visualiser to add a second layer (colours shift yellow → orange → red). Reset accumulated layers with:
 ```bash
@@ -237,6 +239,7 @@ The integration point is the `/rapseb/spray_status` topic (std_msgs/String, JSON
 | /depth_camera/points | sensor_msgs/PointCloud2 | ros_gz_bridge | Overhead depth camera point cloud |
 | /wrist_camera/points | sensor_msgs/PointCloud2 | ros_gz_bridge | Wrist depth camera point cloud |
 | /unknown_points | sensor_msgs/PointCloud2 | pointcloud filter | Unclassified points (potential obstacles) |
+| /obstacle_centroids | visualization_msgs/MarkerArray | obstacles_tracking | DBSCAN cluster centroids of detected obstacles (red spheres in RViz) |
 | scan_cloud | sensor_msgs/PointCloud2 | lidar_surface_scanner | Accumulated scan result |
 | /spray_plan | std_msgs/Float64MultiArray | flat_fan_spraying_v4 | Grid layout: [size_x, size_y, N, x0, y0, x1, y1, ...]. Transient-local QoS. |
 | /spray_current_idx | std_msgs/Int32 | flat_fan_spraying_v4 | Index of spray centre nearest the end-effector, published at ~4 Hz during execution |
