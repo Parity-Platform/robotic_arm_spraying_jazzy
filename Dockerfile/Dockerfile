@@ -59,5 +59,9 @@ RUN usermod -l $USERNAME ubuntu && \
 # Auto-source Vulcanexus environment for every new terminal
 RUN echo "source /opt/vulcanexus/jazzy/setup.bash" >> /home/${USERNAME}/.bashrc
 
+# Software rendering fallback for ogre2 depth cameras in Docker without GPU passthrough
+RUN echo "export LIBGL_ALWAYS_SOFTWARE=1" >> /home/${USERNAME}/.bashrc && \
+    echo "export MESA_NO_ERROR=1" >> /home/${USERNAME}/.bashrc
+
 # Switch to the non-root user
 USER ${USERNAME}

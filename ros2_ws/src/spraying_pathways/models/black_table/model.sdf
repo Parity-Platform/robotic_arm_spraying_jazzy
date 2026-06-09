@@ -51,10 +51,9 @@
           </cylinder>
         </geometry>
         <material>
-          <script>
-            <uri>file://media/materials/scripts/gazebo.material</uri>
-            <name>Gazebo/Black</name>
-          </script>
+          <ambient>0.1 0.1 0.1 1</ambient>
+          <diffuse>0.1 0.1 0.1 1</diffuse>
+          <specular>0.2 0.2 0.2 1</specular>
         </material>
       </visual>
       <collision name='front_right_leg'>
@@ -75,10 +74,9 @@
           </cylinder>
         </geometry>
         <material>
-          <script>
-            <uri>file://media/materials/scripts/gazebo.material</uri>
-            <name>Gazebo/Black</name>
-          </script>
+          <ambient>0.1 0.1 0.1 1</ambient>
+          <diffuse>0.1 0.1 0.1 1</diffuse>
+          <specular>0.2 0.2 0.2 1</specular>
         </material>
       </visual>
       <collision name='back_right_leg'>
@@ -99,10 +97,9 @@
           </cylinder>
         </geometry>
         <material>
-          <script>
-            <uri>file://media/materials/scripts/gazebo.material</uri>
-            <name>Gazebo/Black</name>
-          </script>
+          <ambient>0.1 0.1 0.1 1</ambient>
+          <diffuse>0.1 0.1 0.1 1</diffuse>
+          <specular>0.2 0.2 0.2 1</specular>
         </material>
       </visual>
       <collision name='back_left_leg'>
@@ -123,10 +120,9 @@
           </cylinder>
         </geometry>
         <material>
-          <script>
-            <uri>file://media/materials/scripts/gazebo.material</uri>
-            <name>Gazebo/Black</name>
-          </script>
+          <ambient>0.1 0.1 0.1 1</ambient>
+          <diffuse>0.1 0.1 0.1 1</diffuse>
+          <specular>0.2 0.2 0.2 1</specular>
         </material>
       </visual>
     </link>

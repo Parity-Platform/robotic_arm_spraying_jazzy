@@ -8,8 +8,10 @@ from visualization_msgs.msg import Marker, MarkerArray
 from std_msgs.msg import Float64MultiArray, Int32
 
 LAYER_FILE = "/tmp/epoxy_layers.json"
-Z_BASE = 0.765       # panel surface height in world frame (matches z_base in v4)
-LAYER_HEIGHT = 0.015 # coating thickness added per layer (matches standard_h in v4)
+# box_0_5 panel: center (1.0, 0.2, 0.77) in world, size 0.4x0.4x0.05 -> top surface at 0.795
+# spray_centers from the C++ node are already in world x/y frame (corners 0.8..1.2, 0.0..0.4)
+Z_BASE = 0.795
+LAYER_HEIGHT = 0.015 # coating thickness per layer (matches standard_h in v4)
 
 # Color per cumulative layer count: (R, G, B, A)
 LAYER_COLORS = [
@@ -24,7 +26,7 @@ class EpoxyVisualizer(Node):
     def __init__(self):
         super().__init__('epoxy_visualizer')
 
-        self.spray_centers = []   # list of (x, y) in world frame
+        self.spray_centers = []   # list of (x, y) in world frame, matching panel extents [0.8-1.2, 0.0-0.4]
         self.cube_size_x = 0.0
         self.cube_size_y = 0.0
         self.cell_layers = {}     # cell_idx -> cumulative layer count (from JSON)

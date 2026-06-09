@@ -61,7 +61,7 @@ source install/setup.bash
 - The /rapseb/spray_status topic (std_msgs/String, JSON payload) is the integration point for FIWARE. Not yet published by spraying nodes - see rapseb-fiware repo for the bridge consumer.
 
 ## Style
-
+- resort to the official github repos for all packages. Allways use the jazzy branch.
 - Minimal comments. No "AI-generated" style explanatory comments.
 - Direct, technical language. No filler adjectives.
 - Package maintainer: Parity Platform P.C. (info@parityplatform.com)

@@ -239,11 +239,17 @@ def launch_setup(context, *args, **kwargs):
         ],
     )
 
+    gui_flag = "" if gazebo_gui.perform(context) == "true" else "-s"
+    gz_args_str = f"-r {gui_flag} --render-engine {render_engine.perform(context)} {world_file.perform(context)}".strip()
+
     gzserver = IncludeLaunchDescription(
         PythonLaunchDescriptionSource([
             PathJoinSubstitution([FindPackageShare("ros_gz_sim"), "launch", "gz_sim.launch.py"])
         ]),
-        launch_arguments={"gz_args": ["-r --render-engine ", render_engine, " ", world_file]}.items() # ogre2 needed for depth_camera sensor; use ogre if ogre2 crashes
+        launch_arguments={
+            "gz_args": gz_args_str,       # ogre2 needed for depth_camera; use ogre if ogre2 crashes
+            "on_exit_shutdown": "true",
+        }.items()
     )
 
     # Sensor topic bridge (Gz <-> ROS 2)
