@@ -704,7 +704,7 @@ int main(int argc, char** argv) {
     const double robot_base_x = 0.25;
     const double robot_base_y = 0.0;
 
-    double z_base = 0.765;
+    double z_base = 0.795;
     double spray_width = 0.02;
     double spray_length = 0.1;
     int N = 9;

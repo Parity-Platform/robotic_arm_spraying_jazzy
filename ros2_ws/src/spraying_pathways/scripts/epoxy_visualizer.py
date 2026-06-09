@@ -8,9 +8,11 @@ from visualization_msgs.msg import Marker, MarkerArray
 from std_msgs.msg import Float64MultiArray, Int32
 
 LAYER_FILE = "/tmp/epoxy_layers.json"
-# box_0_5 panel: center (1.0, 0.2, 0.77) in world, size 0.4x0.4x0.05 -> top surface at 0.795
-# spray_centers from the C++ node are already in world x/y frame (corners 0.8..1.2, 0.0..0.4)
-Z_BASE = 0.795
+# Robot spawns at Gz world (0.25, 0, 0.715); ROS TF world = Gz world + SPAWN_OFFSET
+# box_0_5 panel top in Gz world = 0.795; in ROS TF world = 0.795 - 0.715 = 0.080
+SPAWN_OFFSET_X = -0.25
+SPAWN_OFFSET_Z = -0.715
+Z_BASE = 0.795 + SPAWN_OFFSET_Z  # 0.080
 LAYER_HEIGHT = 0.015 # coating thickness per layer (matches standard_h in v4)
 
 # Color per cumulative layer count: (R, G, B, A)
@@ -149,7 +151,7 @@ class EpoxyVisualizer(Node):
             m.id = idx
             m.type = Marker.CUBE
             m.action = Marker.ADD
-            m.pose.position.x = cx
+            m.pose.position.x = cx + SPAWN_OFFSET_X
             m.pose.position.y = cy
             m.pose.position.z = Z_BASE + height / 2.0
             m.pose.orientation.w = 1.0
@@ -169,7 +171,7 @@ class EpoxyVisualizer(Node):
                 t.id = idx + 100000
                 t.type = Marker.TEXT_VIEW_FACING
                 t.action = Marker.ADD
-                t.pose.position.x = cx
+                t.pose.position.x = cx + SPAWN_OFFSET_X
                 t.pose.position.y = cy
                 t.pose.position.z = Z_BASE + height + 0.025
                 t.pose.orientation.w = 1.0
