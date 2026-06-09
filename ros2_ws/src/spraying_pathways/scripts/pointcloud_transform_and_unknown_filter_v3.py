@@ -617,14 +617,22 @@ class CombinedPipelineNode(Node):
         if pts.size == 0:
             return
 
-        # Unified transform
-        # optical -> camera_link
-        pts_cam  = (self.R_initial @ pts.T).T
+        # Transform pointcloud from sensor frame to base_link using TF tree
+        try:
+            tf = self.tf_buffer.lookup_transform(
+                "base_link", msg.header.frame_id,
+                rclpy.time.Time(),
+                timeout=Duration(seconds=0.1)
+            )
+        except Exception as e:
+            self.get_logger().warn(f"TF lookup failed: {e}", throttle_duration_sec=2.0)
+            return
 
-        # camera_link -> base_link  (ΠΡΩΤΑ rotate, ΜΕΤΑ add)
-        pts_base = (self.R_custom  @ pts_cam.T).T + self.translation
-
-        pts = pts_base
+        q = tf.transform.rotation
+        t = tf.transform.translation
+        rot = quaternion_matrix([q.x, q.y, q.z, q.w])[:3, :3].astype(np.float32)
+        trans = np.array([t.x, t.y, t.z], dtype=np.float32)
+        pts = (rot @ pts.T).T + trans
 
         # Publish: all
         hdr_all = msg.header
