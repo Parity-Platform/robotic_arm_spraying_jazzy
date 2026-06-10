@@ -10,6 +10,11 @@ docker image build -t my-vulcanexus:jazzy-desktop .
 
 To run the Docker container based on the previously built image, make sure you are located inside the directory that contains the `ros2_ws` folder. This folder is required because it will be mounted into the container at runtime. The `ros2_ws` directory is included in the GitHub project.
 
+On Linux (not WSL2), allow X11 GUI forwarding first:
+```bash
+xhost +local:docker
+```
+
 ```bash
 docker run -it --rm --name vulcanexus-container --user vulcanexus_user \
   -v $PWD/ros2_ws:/ros2_ws -w /ros2_ws \
@@ -43,12 +48,21 @@ source install/setup.bash
 
 ```bash
 docker exec -it vulcanexus-container /bin/bash
+source /opt/ros/jazzy/setup.bash
 source install/setup.bash
 ```
 
 ## Rebuilding After Changes
 
-Every time you make changes to the workspace files inside the container — such as modifying source code, updating packages, or changing build configuration — you need to clean and rebuild the workspace (inside the `/ros2_ws` directory).
+With `--symlink-install`, Python scripts in `scripts/` are symlinked directly from source — edits take effect immediately without a rebuild. A full rebuild is only required after C++ source changes or when adding new packages.
+
+```bash
+cd /ros2_ws
+colcon build --symlink-install --executor sequential
+source install/setup.bash
+```
+
+If the build is stale or you hit unexplained errors, do a clean rebuild:
 
 ```bash
 rm -rf build/ log/ install/

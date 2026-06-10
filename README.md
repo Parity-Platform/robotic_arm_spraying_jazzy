@@ -10,7 +10,7 @@ The workcell operates as a closed-loop spraying pipeline:
 2. **Path planning** -- MoveIt 2 computes Cartesian spray trajectories over the panel surface, using flat-fan coverage grids with velocity-profiled motion.
 3. **Spraying execution** -- The UR10e follows the planned trajectory while the flat-fan nozzle deposits epoxy. Pass coverage is tracked incrementally.
 4. **Obstacle monitoring** -- Point cloud filtering separates known geometry (table, panel, robot) from unknown objects. DBSCAN clustering detects obstacle clusters and triggers protective stops. The spraying node includes a pause/resume gate that halts execution while unknown points are present and resumes from the nearest trajectory point once the hazard clears.
-5. **Collision avoidance (in progress)** -- Detected obstacle clusters will be fed into MoveIt's planning scene as collision objects, allowing the planner to route around dynamic obstacles instead of only stopping. See `collision_scene_manager.py` (planned).
+5. **Collision avoidance** -- Obstacle detection is complete. Detected clusters trigger a protective stop and resume automatically once the obstacle clears. Integration of detected clusters into the MoveIt planning scene as collision objects (route-around instead of stop) is not yet implemented.
 6. **HRI safety (optional)** -- A separate node monitors human proximity via ros4hri and enforces ISO 10218 safety zones.
 
 The pipeline runs inside a Vulcanexus Jazzy Docker container. Gz Harmonic provides physics simulation with depth camera and LiDAR sensor emulation. The ros_gz_bridge forwards sensor data between Gz transport and ROS 2 topics.
@@ -91,15 +91,15 @@ Located in `include/spraying_pathways/`:
 #### URDF / Xacro
 
 - `my_robot.urdf.xacro` -- Master robot assembly. Includes the UR10e description, two depth cameras (fixed overhead + wrist-mounted), and optionally a 2D LiDAR.
-- `depth_camera.urdf.xacro` -- Fixed overhead depth camera. Gz Harmonic sensor type `depth_camera`, 1024x576 at 30 Hz, 60-degree FOV, 0.05-20m range.
-- `depth_camera_ee.urdf.xacro` -- Wrist-mounted depth camera on `wrist_3_link`. Same sensor specs as overhead.
+- `depth_camera.urdf.xacro` -- Fixed overhead depth camera. Gz Harmonic sensor type `depth_camera`, 424x240 at 5 Hz, 60-degree FOV, 0.05-20m range. Rate reduced from 30 Hz to maintain real-time factor on CPU-only rendering.
+- `depth_camera_ee.urdf.xacro` -- Wrist-mounted depth camera on `wrist_3_link`. 320x240 at 5 Hz.
 - `2d_lidar.urdf.xacro` -- 2D LiDAR sensor. Gz Harmonic sensor type `gpu_lidar`.
 
 #### Gz Harmonic Assets
 
 **Worlds:**
-- `first_test_case.world` -- Primary simulation world with UR10e, spray panels, ground plane, and lighting. Uses ODE physics.
-- `table_world.world` -- Alternative world with table setup.
+- `table_world.world` -- Active simulation world. UR10e, wood_table, black_table, box_0_5 spray panel, human_arm dynamic obstacle. Requires `gz::sim::systems::Sensors` with `ogre2` render engine for depth camera support.
+- `first_test_case.world` -- Earlier world retained for reference.
 
 **Models:**
 - `human_arm/` -- Articulated human arm obstacle with STL/OBJ meshes. Controlled via `gz::sim::systems::VelocityControl` (cmd_vel topic bridged via ros_gz_bridge).
