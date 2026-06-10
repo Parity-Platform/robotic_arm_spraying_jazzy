@@ -216,6 +216,29 @@ Coloured cubes appear on the panel in RViz as the robot moves over each cell. Ru
 rm /tmp/epoxy_layers.json
 ```
 
+### Testing Obstacle Detection
+
+The `human_arm` simulation model is controlled via velocity commands on `/human_arm/cmd_vel`.
+
+**Automated bounce** -- sweeps the arm along the Y axis (±3 m at 0.2 m/s):
+```bash
+ros2 run spraying_pathways moving_obstacle_node
+```
+
+**Manual velocity** -- publishes continuously until Ctrl+C:
+```bash
+ros2 topic pub /human_arm/cmd_vel geometry_msgs/msg/Twist "{linear: {x: 0.0, y: -0.2, z: 0.0}}"
+```
+
+**Stop the arm:**
+```bash
+ros2 topic pub --once /human_arm/cmd_vel geometry_msgs/msg/Twist "{}"
+```
+
+When the arm enters the camera's FOV, `flat_fan_spraying_v4_node` pauses automatically and resumes once the obstacle clears. Red spheres appear on `/obstacle_centroids` in RViz while the obstacle is detected.
+
+To change the arm's starting position permanently, edit the `<pose>` of the `human_arm` include in `worlds/table_world.world`.
+
 ### Opening Additional Terminals
 
 ```bash

@@ -57,3 +57,6 @@ CATKIN_IGNORE
 
 # Private Claude instructions (local only)
 .claude/CLAUDE.md
+
+# demos
+demos/
