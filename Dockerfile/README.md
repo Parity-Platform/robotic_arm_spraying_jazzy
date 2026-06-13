@@ -10,6 +10,11 @@ docker image build -t my-vulcanexus:jazzy-desktop .
 
 To run the Docker container based on the previously built image, make sure you are located inside the directory that contains the `ros2_ws` folder. This folder is required because it will be mounted into the container at runtime. The `ros2_ws` directory is included in the GitHub project.
 
+On Linux (not WSL2), allow X11 GUI forwarding first:
+```bash
+xhost +local:docker
+```
+
 ```bash
 docker run -it --rm --name vulcanexus-container --user vulcanexus_user \
   -v $PWD/ros2_ws:/ros2_ws -w /ros2_ws \
@@ -21,14 +26,21 @@ docker run -it --rm --name vulcanexus-container --user vulcanexus_user \
 
 ## First-Time Container Setup
 
-After launching the container for the first time, you need to perform some initial setup steps inside the container. These commands should be executed inside the `/ros2_ws` directory.
+Clone `gz_ros2_control` from source before building. The apt package (1.2.17) has a threading bug in `GazeboSimSystem::initSim`; the source build from the jazzy branch fixes it. Run this on the **host** (not inside the container), from the repo root:
 
 ```bash
-rm -rf build/ log/ install/
-colcon build --symlink-install
-source install/setup.bash
+cd ros2_ws/src
+git clone https://github.com/ros-controls/gz_ros2_control.git --branch jazzy --depth 1 gz_ros2_control
+```
 
+Then inside the container:
+
+```bash
+cd /ros2_ws
+rm -rf build/ log/ install/
 rosdep update && rosdep install --ignore-src --from-paths . -y
+colcon build --symlink-install --executor sequential
+source install/setup.bash
 ```
 
 ## Opening a New Terminal Inside the Running Container
@@ -36,16 +48,25 @@ rosdep update && rosdep install --ignore-src --from-paths . -y
 
 ```bash
 docker exec -it vulcanexus-container /bin/bash
+source /opt/ros/jazzy/setup.bash
 source install/setup.bash
 ```
 
 ## Rebuilding After Changes
 
-Every time you make changes to the workspace files inside the container — such as modifying source code, updating packages, or changing build configuration — you need to clean and rebuild the workspace (inside the `/ros2_ws` directory).
+With `--symlink-install`, Python scripts in `scripts/` are symlinked directly from source — edits take effect immediately without a rebuild. A full rebuild is only required after C++ source changes or when adding new packages.
+
+```bash
+cd /ros2_ws
+colcon build --symlink-install --executor sequential
+source install/setup.bash
+```
+
+If the build is stale or you hit unexplained errors, do a clean rebuild:
 
 ```bash
 rm -rf build/ log/ install/
-colcon build
+colcon build --symlink-install --executor sequential
 source install/setup.bash
 ```
 
@@ -59,7 +80,7 @@ ros2 launch ur_description view_ur.launch.py ur_type:=ur10
 ## Launching the Robot in Gazebo using `spraying_pathways` package with custom World and custom Urdf file
 
 ```bash
-ros2 launch spraying_pathways bringup_v4.launch.py
+ros2 launch spraying_pathways bringup_v5.launch.py
 ```
 
 ## Sending the Robot to its Home Position
@@ -67,6 +88,63 @@ ros2 launch spraying_pathways bringup_v4.launch.py
 ```bash
 ros2 run spraying_pathways go_home_node
 ```
+
+## Executing the Flat-Fan Spray with Progressive Visualisation
+
+Make sure the robot is at its home position before starting.
+
+The epoxy visualiser and obstacle tracking nodes now start automatically as part of `bringup_v5.launch.py`. No separate terminal is needed for them.
+
+Run the spraying node:
+```bash
+ros2 run spraying_pathways flat_fan_spraying_v4_node
+```
+
+In RViz: click **Add** → **MarkerArray** and add these topics:
+
+| Topic | What you see |
+|-------|-------------|
+| `/epoxy_coating_markers` | Coloured cubes on the panel growing in real time |
+| `/obstacle_centroids` | Red spheres at detected obstacle positions |
+| `/known_objects_markers` | Green shapes (table, panel -- already known) |
+| `/robot_objects_markers` | Blue shapes (robot self-filter volumes) |
+
+Cube colours encode how many times each cell has been coated:
+
+| Colour | Layer count |
+|--------|-------------|
+| Yellow (semi-transparent) | 1 |
+| Orange | 2 |
+| Deep orange | 3 |
+| Dark red | 4+ |
+
+Each additional run of `flat_fan_spraying_v4_node` adds another layer on top. Layer data is saved to `/tmp/epoxy_layers.json` between runs. To reset all layer history:
+```bash
+rm /tmp/epoxy_layers.json
+```
+
+## Testing Obstacle Detection
+
+The `human_arm` model in the simulation world is controlled via velocity commands on `/human_arm/cmd_vel` (bridged from ROS 2 to Gz via ros_gz_bridge).
+
+**Automated bounce** -- sweeps the arm along the Y axis (±3 m at 0.2 m/s):
+```bash
+ros2 run spraying_pathways moving_obstacle_node
+```
+
+**Manual velocity** -- publishes continuously until Ctrl+C:
+```bash
+ros2 topic pub /human_arm/cmd_vel geometry_msgs/msg/Twist "{linear: {x: 0.0, y: -0.2, z: 0.0}}"
+```
+
+**Stop the arm:**
+```bash
+ros2 topic pub --once /human_arm/cmd_vel geometry_msgs/msg/Twist "{}"
+```
+
+When the arm enters the camera's field of view, `pointcloud_transform_and_unknown_filter_v3.py` will publish points on `/unknown_points`. `obstacles_tracking.py` clusters them and `flat_fan_spraying_v4_node` pauses automatically. The spraying resumes once the obstacle clears.
+
+To change the arm's starting position, edit the `<pose>` of the `human_arm` include in `worlds/table_world.world`.
 
 ## Executing Surface Scan or Scan & Glue Spraying
 

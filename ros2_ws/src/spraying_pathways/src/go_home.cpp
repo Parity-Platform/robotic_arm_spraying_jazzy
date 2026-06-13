@@ -4,11 +4,17 @@
 #include "ament_index_cpp/get_package_share_directory.hpp"
 #include <yaml-cpp/yaml.h>
 #include <fstream>
+#include <thread>
 
 int main(int argc, char **argv)
 {
   rclcpp::init(argc, argv);
   auto node = rclcpp::Node::make_shared("go_home_node");
+
+  auto executor = std::make_shared<rclcpp::executors::SingleThreadedExecutor>();
+  executor->add_node(node);
+  std::thread executor_thread([&executor]() { executor->spin(); });
+
   double max_vel = node->declare_parameter("max_velocity", 0.1);
   double max_acc = node->declare_parameter("max_acceleration", 0.05);
   double plan_time = node->declare_parameter("planning_time", 10.0);
@@ -50,17 +56,21 @@ int main(int argc, char **argv)
   std::vector<double> home_joint_values = {0.0, -2.15, 2.15, -1.57, -1.57, 0.0};
   move_group.setJointValueTarget(home_joint_values);
   moveit::planning_interface::MoveGroupInterface::Plan plan;
-  bool success = (move_group.plan(plan) == moveit::core::MoveItErrorCode::SUCCESS);
-  
-  if (success)
+  auto plan_result = move_group.plan(plan);
+
+  if (plan_result == moveit::core::MoveItErrorCode::SUCCESS)
   {
-    RCLCPP_INFO(node->get_logger(), "Plan successful. Executing...");
-    move_group.move();
+    RCLCPP_INFO(node->get_logger(), "Plan found. Executing...");
+    auto exec_result = move_group.execute(plan);
+    if (exec_result != moveit::core::MoveItErrorCode::SUCCESS)
+      RCLCPP_ERROR(node->get_logger(), "Execution failed.");
   }
   else
   {
     RCLCPP_ERROR(node->get_logger(), "Planning failed.");
   }
+  executor->cancel();
+  executor_thread.join();
   rclcpp::shutdown();
   return 0;
 }

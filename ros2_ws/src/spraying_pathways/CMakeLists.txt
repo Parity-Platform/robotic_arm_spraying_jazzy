@@ -303,6 +303,7 @@ install(PROGRAMS
   scripts/pointcloud_transform_and_unknown_filter_v2.py
   scripts/pointcloud_transform_and_unknown_filter_v3.py
   scripts/obstacles_tracking.py
+  scripts/epoxy_visualizer.py
   DESTINATION lib/${PROJECT_NAME}
 )
 

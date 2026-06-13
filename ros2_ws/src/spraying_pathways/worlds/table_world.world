@@ -2,6 +2,13 @@
 <sdf version="1.6">
   <world name="default">
 
+    <plugin filename="gz-sim-physics-system" name="gz::sim::systems::Physics"/>
+    <plugin filename="gz-sim-user-commands-system" name="gz::sim::systems::UserCommands"/>
+    <plugin filename="gz-sim-scene-broadcaster-system" name="gz::sim::systems::SceneBroadcaster"/>
+    <plugin filename="gz-sim-sensors-system" name="gz::sim::systems::Sensors">
+      <render_engine>ogre2</render_engine>
+    </plugin>
+
     <light type="directional" name="sun">
       <cast_shadows>true</cast_shadows>
       <pose>0 0 10 0 0 0</pose>
@@ -57,7 +64,11 @@
       <uri>file:///ros2_ws/install/spraying_pathways/share/spraying_pathways/models/box_0_5</uri>
       <pose>1.0 0.2 0.77 0 0 0</pose>
     </include>
-    
+
+    <include>
+      <uri>file:///ros2_ws/install/spraying_pathways/share/spraying_pathways/models/human_arm</uri>
+      <pose>2.5 0 0.9 0 0 -1.5708</pose>
+    </include>
 
   </world>
 </sdf>

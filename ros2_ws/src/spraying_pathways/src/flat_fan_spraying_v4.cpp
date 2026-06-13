@@ -43,6 +43,8 @@
 #include <chrono>
 #include <thread>
 #include <moveit/robot_state/conversions.hpp>
+#include <std_msgs/msg/float64_multi_array.hpp>
+#include <std_msgs/msg/int32.hpp>
 
 using moveit::core::RobotState;
 
@@ -433,8 +435,8 @@ public:
   : node_(node)
   {
     unknown_topic_   = node_->declare_parameter<std::string>("unknown_topic", "/unknown_points");
-    min_points_      = node_->declare_parameter<int>("min_points", 1);
-    debounce_ms_     = node_->declare_parameter<int>("debounce_ms", 200);
+    min_points_      = node_->declare_parameter<int>("min_points", 50);
+    debounce_ms_     = node_->declare_parameter<int>("debounce_ms", 1000);
     controller_ns_   = node_->declare_parameter<std::string>("controller_ns", "joint_trajectory_controller");
 
     auto qos = rclcpp::QoS(rclcpp::KeepLast(10)).reliable();
@@ -611,7 +613,7 @@ static void execute_with_pause_resume(
 
     // start_state = τρέχουσα στάση (βοηθά στα tolerances)
     {
-      moveit::core::RobotStatePtr st = mgi.getCurrentState(0.2);
+      moveit::core::RobotStatePtr st = mgi.getCurrentState(2.0);
       moveit::core::robotStateToRobotStateMsg(*st, plan2.start_state);
     }
 
@@ -663,6 +665,10 @@ int main(int argc, char** argv) {
         executor->spin();
     });
 
+    auto spray_plan_pub = node->create_publisher<std_msgs::msg::Float64MultiArray>(
+        "/spray_plan", rclcpp::QoS(1).transient_local());
+    auto spray_idx_pub = node->create_publisher<std_msgs::msg::Int32>("/spray_current_idx", 10);
+
     // === Load kinematics.yaml and set parameters ===
     std::string kinematics_path = ament_index_cpp::get_package_share_directory("ur_moveit_config") + "/config/kinematics.yaml";
     YAML::Node yaml = YAML::LoadFile(kinematics_path);
@@ -698,7 +704,7 @@ int main(int argc, char** argv) {
     const double robot_base_x = 0.25;
     const double robot_base_y = 0.0;
 
-    double z_base = 0.765;
+    double z_base = 0.795;
     double spray_width = 0.02;
     double spray_length = 0.1;
     int N = 9;
@@ -716,6 +722,19 @@ int main(int argc, char** argv) {
     cube_size_y = std::abs(cube_size_y);
 
     apply_flat_spray(cubes, spray_centers, cube_size_x, cube_size_y, radius, standard_h, min_h, sigma, z_base);
+
+    {
+        std_msgs::msg::Float64MultiArray plan_msg;
+        plan_msg.data.push_back(std::abs(cube_size_x));
+        plan_msg.data.push_back(std::abs(cube_size_y));
+        plan_msg.data.push_back(static_cast<double>(spray_centers.size()));
+        for (const auto& sc : spray_centers) {
+            plan_msg.data.push_back(sc.x);
+            plan_msg.data.push_back(sc.y);
+        }
+        spray_plan_pub->publish(plan_msg);
+        RCLCPP_INFO(node->get_logger(), "Spray plan published: %zu centers", spray_centers.size());
+    }
 
     geometry_msgs::msg::Quaternion orientation;
     orientation.x = 0.0;
@@ -871,9 +890,39 @@ int main(int argc, char** argv) {
 
     UnknownGate gate(node);
 
+    std::atomic<bool> monitor_running{true};
+    std::thread monitor_thread([&]() {
+        while (monitor_running.load(std::memory_order_relaxed)) {
+            try {
+                auto ps = move_group.getCurrentPose();
+                double ex = ps.pose.position.x;
+                double ey = ps.pose.position.y;
+                double min_d2 = 0.0025; // 5 cm radius threshold
+                int nearest = -1;
+                for (size_t i = 0; i < spray_centers.size(); ++i) {
+                    double dx = (spray_centers[i].x - robot_base_x) - ex;
+                    double dy = (spray_centers[i].y - robot_base_y) - ey;
+                    double d2 = dx * dx + dy * dy;
+                    if (d2 < min_d2) { min_d2 = d2; nearest = static_cast<int>(i); }
+                }
+                if (nearest >= 0) {
+                    std_msgs::msg::Int32 idx_msg;
+                    idx_msg.data = nearest;
+                    spray_idx_pub->publish(idx_msg);
+                }
+            } catch (...) {}
+            std::this_thread::sleep_for(std::chrono::milliseconds(250));
+        }
+    });
+
+    // Let the controller settle after the initial move-to-start-point execution
+    std::this_thread::sleep_for(std::chrono::milliseconds(600));
+
     // === Εκτέλεση με stop/resume ===
     RCLCPP_INFO(node->get_logger(), "Executing FK-time-mapped trajectory...");
     execute_with_pause_resume(move_group, msg, gate, planning_group);
+    monitor_running.store(false, std::memory_order_relaxed);
+    monitor_thread.join();
 
     ////////////////////////////////////////////////////////////////////////////////////////
 

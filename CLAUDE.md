@@ -6,7 +6,7 @@ Autonomous epoxy spraying workcell for composite panel coating, developed by Par
 
 ## Stack
 
-- ROS 2 Jazzy on Vulcanexus (previously ROS 2 Humble, migration bugs present)
+- ROS 2 Jazzy on Vulcanexus
 - Gz Harmonic (not Gazebo Classic - this matters for all simulation plugins and URDF sensors)
 - MoveIt 2 for motion planning
 - gz_ros2_control for joint control in simulation
@@ -29,7 +29,7 @@ Main package. C++ nodes for cartesian path planning and spraying (flat_fan_spray
 
 Important paths:
 - `urdf/` - Xacro files for depth cameras and LiDAR (Gz Harmonic sensor types: depth_camera, gpu_lidar)
-- `worlds/first_test_case.world` - Gz Harmonic world with UR10e, spray panels, and human_arm obstacle
+- `worlds/table_world.world` - Active Gz Harmonic world with UR10e, spray panels, and human_arm obstacle
 - `config/gz_bridge.yaml` - ros_gz_bridge topic mappings
 - `models/human_arm/model.sdf` - Moving obstacle using gz::sim::systems::VelocityControl
 
@@ -59,9 +59,10 @@ source install/setup.bash
 - The ros_gz_bridge handles all Gz <-> ROS 2 topic bridging via config/gz_bridge.yaml.
 - Controller manager uses scaled_joint_trajectory_controller for UR10e.
 - The /rapseb/spray_status topic (std_msgs/String, JSON payload) is the integration point for FIWARE. Not yet published by spraying nodes - see rapseb-fiware repo for the bridge consumer.
+- Gz world frame vs ROS TF world frame: the robot spawns at (-x 0.25 -y 0 -z 0.715) in Gz world, but the URDF world→base_link joint is identity — the spawn offset is not in the TF tree. All point clouds (TF-transformed to base_link) and all RViz markers must apply position_offset = [-0.25, 0, -0.715] to convert Gz-world positions into the ROS TF frame. See pointcloud_transform_and_unknown_filter_v3.py and epoxy_visualizer.py.
 
 ## Style
-
+- resort to the official github repos for all packages. Always use the jazzy branch.
 - Minimal comments. No "AI-generated" style explanatory comments.
 - Direct, technical language. No filler adjectives.
 - Package maintainer: Parity Platform P.C. (info@parityplatform.com)

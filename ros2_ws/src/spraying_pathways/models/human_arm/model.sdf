@@ -23,11 +23,15 @@
         <cast_shadows>true</cast_shadows>
         <geometry>
           <mesh>
-            <!-- keep your absolute path if you prefer -->
             <uri>file:///ros2_ws/install/spraying_pathways/share/spraying_pathways/models/human_arm/meshes/arm.obj</uri>
             <scale>1 1 1</scale>
           </mesh>
         </geometry>
+        <material>
+          <ambient>0.8 0.65 0.5 1</ambient>
+          <diffuse>0.8 0.65 0.5 1</diffuse>
+          <specular>0.1 0.1 0.1 1</specular>
+        </material>
       </visual>
 
       <!-- Collision -->
